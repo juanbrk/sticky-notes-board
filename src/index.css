@@ -1,3 +1,20 @@
+:root {
+  --board-width: 960px;
+  --board-height: 640px;
+  --radius-board: 4px;
+  --radius-note: 2px;
+
+  --color-text: #2b2a27;
+  --color-page-bg: #e9e7e1;
+  --color-board-bg: #fbfaf7;
+  --color-board-border: #c8c4b9;
+  --color-note: #fff740;
+  --color-note-preview: rgb(255 247 64 / 50%);
+  --color-note-preview-outline: #a39a1c;
+
+  --shadow-note: 0 1px 2px rgb(0 0 0 / 14%), 0 4px 10px rgb(0 0 0 / 10%);
+}
+
 *,
 *::before,
 *::after {
@@ -12,6 +29,7 @@ body,
 }
 
 body {
+  background: var(--color-page-bg);
   font-family:
     system-ui,
     -apple-system,

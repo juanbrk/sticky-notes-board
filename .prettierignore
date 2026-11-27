@@ -9,3 +9,6 @@ dist/
 node_modules/
 coverage/
 package-lock.json
+
+# design-plugin cache written by the impeccable hook; local tooling, not application code
+.impeccable/

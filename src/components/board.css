@@ -1,0 +1,22 @@
+.board {
+  position: relative;
+  flex: none;
+  width: var(--board-width);
+  height: var(--board-height);
+  /* Notes are not clamped yet (nice-to-have N4): what overflows the board is clipped. */
+  overflow: hidden;
+  background: var(--color-board-bg);
+  border: 1px solid var(--color-board-border);
+  border-radius: var(--radius-board);
+  cursor: crosshair;
+  user-select: none;
+  touch-action: none;
+}
+
+.board__preview {
+  position: absolute;
+  background: var(--color-note-preview);
+  border: 1px dashed var(--color-note-preview-outline);
+  border-radius: var(--radius-note);
+  pointer-events: none;
+}
