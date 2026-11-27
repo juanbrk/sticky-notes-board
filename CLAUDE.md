@@ -9,6 +9,10 @@ Single-page sticky-notes board: React + TypeScript, **no stock components**, des
 - **Dev server**: `npm run dev`.
 - **Base branch**: `main`. Every feature is built in its own worktree (`/worktree`), never on `main`.
 
+## Before answering
+
+Before answering any request, first list what you would need to know that the User has not told you (missing facts, open decisions, assumptions you would otherwise make). Do this every time, then answer or ask.
+
 ## After editing
 
 Always run `npm run lint` and `npm run type-check`. `npm run format:check` and `npm test` are part of `/audit-pr`.

@@ -26,6 +26,7 @@ coverage
 
 # Local-only tracking notes (interview preparation), never pushed
 TICKET.md
+tickets.md
 roadmap.md
 .claude/memory/memory-decisions.md
 .claude/memory/memory-sessions.md
