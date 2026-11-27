@@ -47,8 +47,8 @@ const NoteCardView = ({ note, onMove, onResize, onDelete, trashRef }: Notes.Note
 /**
  * A sticky note placed at its position and size on the board; drag it to move
  * it, drop it on the trash to delete it, or drag its bottom-right corner to
- * resize it. Only the move can delete, so a resize never does. Memoised: the reducer keeps
- * untouched notes as the same objects and the callbacks are stable, so a change
- * to one note renders only that card.
+ * resize it. Only the move can delete, so a resize never does. Memoised: the
+ * reducer keeps untouched notes as the same objects and the callbacks are
+ * stable, so a change to one note renders only that card.
  */
 export const NoteCard = memo(NoteCardView);

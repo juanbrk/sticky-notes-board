@@ -37,8 +37,8 @@ export type NoteGesture = 'move' | 'resize';
 export type NoteRectTransform = (start: Geometry.Rect, delta: Geometry.Point2d) => Geometry.Rect;
 
 /**
- * Where a dragged note's state relative to the trash shows, through the note's `data-drop`
- * attribute: `ready` once a move drag is under way, `armed` while a release would delete it.
+ * A moving note's drop state, written to its `data-drop`: `ready` once the drag
+ * is under way, `armed` while a release would delete it.
  */
 export type NoteDropState = 'ready' | 'armed';
 
