@@ -3,4 +3,14 @@
   background: var(--color-note);
   border-radius: var(--radius-note);
   box-shadow: var(--shadow-note);
+  cursor: grab;
+}
+
+/* Set by useDragNote for the length of a drag. */
+.note-card[data-gesture] {
+  box-shadow: var(--shadow-note-dragging);
+}
+
+.note-card[data-gesture='move'] {
+  cursor: grabbing;
 }

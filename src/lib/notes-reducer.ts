@@ -1,3 +1,4 @@
+import * as GeometryUtils from '../helpers/geometry.helpers';
 import type * as Notes from '../types/notes.types';
 
 export const INITIAL_NOTES_STATE: Notes.NotesState = { notes: [] };
@@ -19,5 +20,36 @@ export const notesReducer = (
   switch (action.type) {
     case 'createNote':
       return { ...state, notes: [...state.notes, { id: action.id, ...action.rect }] };
+    case 'moveNote':
+      return updateNoteRect(state, action.id, (note) => ({
+        ...note,
+        x: action.position.x,
+        y: action.position.y,
+      }));
+    case 'resizeNote':
+      return updateNoteRect(state, action.id, (note) => ({
+        ...note,
+        width: action.size.width,
+        height: action.size.height,
+      }));
   }
+};
+
+/**
+ * Replaces one note's rect. An unknown id or an unchanged rect returns `state`
+ * itself, so a drag that ends where it started re-renders nothing.
+ */
+const updateNoteRect = (
+  state: Notes.NotesState,
+  id: string,
+  getNextNote: (note: Notes.Note) => Notes.Note
+): Notes.NotesState => {
+  const note = state.notes.find((candidate) => candidate.id === id);
+  if (!note) return state;
+  const nextNote = getNextNote(note);
+  if (GeometryUtils.isSameRect(note, nextNote)) return state;
+  return {
+    ...state,
+    notes: state.notes.map((candidate) => (candidate === note ? nextNote : candidate)),
+  };
 };

@@ -50,3 +50,96 @@ describe('notesReducer', () => {
     });
   });
 });
+
+const twoNotes = (): Notes.NotesState =>
+  [createNote('a', 10, 20), createNote('b', 300, 200)].reduce(notesReducer, INITIAL_NOTES_STATE);
+
+describe('notesReducer', () => {
+  describe('moveNote', () => {
+    it('moves only the target note and keeps its size', () => {
+      const state = twoNotes();
+
+      const nextState = notesReducer(state, {
+        type: 'moveNote',
+        id: 'a',
+        position: { x: 50, y: 60 },
+      });
+
+      expect(nextState.notes[0]).toEqual({ id: 'a', x: 50, y: 60, width: 120, height: 80 });
+      expect(nextState.notes[1]).toBe(state.notes[1]);
+    });
+
+    it('takes only the position, even when given a whole rect', () => {
+      const rect = { x: 50, y: 60, width: 999, height: 999 };
+
+      const nextState = notesReducer(twoNotes(), { type: 'moveNote', id: 'a', position: rect });
+
+      expect(nextState.notes[0]).toMatchObject({ width: 120, height: 80 });
+    });
+
+    it('does not mutate the previous state', () => {
+      const state = twoNotes();
+      const movedNote = state.notes[0];
+
+      notesReducer(state, { type: 'moveNote', id: 'a', position: { x: 50, y: 60 } });
+
+      expect(state.notes[0]).toBe(movedNote);
+      expect(movedNote).toMatchObject({ x: 10, y: 20 });
+    });
+
+    it('returns the same state for an unknown id', () => {
+      const state = twoNotes();
+
+      expect(notesReducer(state, { type: 'moveNote', id: 'zz', position: { x: 1, y: 1 } })).toBe(
+        state
+      );
+    });
+
+    it('returns the same state when the position did not change', () => {
+      const state = twoNotes();
+
+      expect(notesReducer(state, { type: 'moveNote', id: 'a', position: { x: 10, y: 20 } })).toBe(
+        state
+      );
+    });
+  });
+
+  describe('resizeNote', () => {
+    it('resizes only the target note and keeps its position', () => {
+      const state = twoNotes();
+
+      const nextState = notesReducer(state, {
+        type: 'resizeNote',
+        id: 'b',
+        size: { width: 200, height: 150 },
+      });
+
+      expect(nextState.notes[1]).toEqual({ id: 'b', x: 300, y: 200, width: 200, height: 150 });
+      expect(nextState.notes[0]).toBe(state.notes[0]);
+    });
+
+    it('takes only the size, even when given a whole rect', () => {
+      const rect = { x: 0, y: 0, width: 200, height: 150 };
+
+      const nextState = notesReducer(twoNotes(), { type: 'resizeNote', id: 'b', size: rect });
+
+      expect(nextState.notes[1]).toMatchObject({ x: 300, y: 200 });
+    });
+
+    it('returns the same state for an unknown id', () => {
+      const state = twoNotes();
+
+      expect(
+        notesReducer(state, { type: 'resizeNote', id: 'zz', size: { width: 50, height: 50 } })
+      ).toBe(state);
+    });
+
+    it('returns the same state when the size did not change', () => {
+      const state = twoNotes();
+
+      expect(
+        notesReducer(state, { type: 'resizeNote', id: 'b', size: { width: 120, height: 80 } })
+      ).toBe(state);
+    });
+  });
+});

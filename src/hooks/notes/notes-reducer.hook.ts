@@ -17,5 +17,13 @@ export const useNotesReducer = (): Notes.NotesStore => {
     dispatch({ type: 'createNote', id: crypto.randomUUID(), rect });
   }, []);
 
-  return { notes: state.notes, createNote };
+  const moveNote = useCallback((id: string, position: Geometry.Point2d) => {
+    dispatch({ type: 'moveNote', id, position });
+  }, []);
+
+  const resizeNote = useCallback((id: string, size: Geometry.Size) => {
+    dispatch({ type: 'resizeNote', id, size });
+  }, []);
+
+  return { notes: state.notes, createNote, moveNote, resizeNote };
 };

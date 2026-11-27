@@ -1,6 +1,4 @@
 :root {
-  --board-width: 960px;
-  --board-height: 640px;
   --radius-board: 4px;
   --radius-note: 2px;
 
@@ -13,6 +11,7 @@
   --color-note-preview-outline: #a39a1c;
 
   --shadow-note: 0 1px 2px rgb(0 0 0 / 14%), 0 4px 10px rgb(0 0 0 / 10%);
+  --shadow-note-dragging: 0 2px 4px rgb(0 0 0 / 16%), 0 10px 24px rgb(0 0 0 / 18%);
 }
 
 *,
