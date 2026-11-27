@@ -1,11 +1,15 @@
 import type { RefObject } from 'react';
 
+import type { NOTE_COLORS } from '../lib/note-colors.constants';
 import type * as Geometry from './geometry.types';
 
 // 1. Entities
 
+export type NoteColor = (typeof NOTE_COLORS)[number];
+
 export interface Note extends Geometry.Rect {
   id: string;
+  color: NoteColor;
 }
 
 // 3. Props and hook options
@@ -14,6 +18,13 @@ export interface NoteCardProps {
   note: Note;
   onMove: (id: string, position: Geometry.Point2d) => void;
   onResize: (id: string, size: Geometry.Size) => void;
+  onColorChange: (id: string, color: NoteColor) => void;
+}
+
+export interface NoteColorPickerProps {
+  noteId: string;
+  color: NoteColor;
+  onColorChange: (id: string, color: NoteColor) => void;
 }
 
 export interface BoardProps {
@@ -21,6 +32,7 @@ export interface BoardProps {
   onCreateNote: (rect: Geometry.Rect) => void;
   onMoveNote: (id: string, position: Geometry.Point2d) => void;
   onResizeNote: (id: string, size: Geometry.Size) => void;
+  onSetNoteColor: (id: string, color: NoteColor) => void;
 }
 
 /** Which drag a note is going through; styled through the note's `data-gesture` attribute. */
@@ -57,7 +69,13 @@ interface ResizeNote {
   size: Geometry.Size;
 }
 
-export type NotesAction = CreateNote | MoveNote | ResizeNote;
+interface SetNoteColor {
+  type: 'setNoteColor';
+  id: string;
+  color: NoteColor;
+}
+
+export type NotesAction = CreateNote | MoveNote | ResizeNote | SetNoteColor;
 
 // 5. State
 
@@ -71,4 +89,5 @@ export interface NotesStore {
   createNote: (rect: Geometry.Rect) => void;
   moveNote: (id: string, position: Geometry.Point2d) => void;
   resizeNote: (id: string, size: Geometry.Size) => void;
+  setNoteColor: (id: string, color: NoteColor) => void;
 }

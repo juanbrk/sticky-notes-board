@@ -14,7 +14,13 @@ import { NoteCard } from './note-card';
  * preview is written straight to the DOM through a ref, so a drag costs no
  * React renders; the board state changes once, on release.
  */
-export const Board = ({ notes, onCreateNote, onMoveNote, onResizeNote }: Notes.BoardProps) => {
+export const Board = ({
+  notes,
+  onCreateNote,
+  onMoveNote,
+  onResizeNote,
+  onSetNoteColor,
+}: Notes.BoardProps) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const boardOriginRef = useRef<Geometry.Point2d>({ x: 0, y: 0 });
@@ -84,7 +90,13 @@ export const Board = ({ notes, onCreateNote, onMoveNote, onResizeNote }: Notes.B
   return (
     <div ref={boardRef} className="board" style={BOARD_SIZE} {...dragHandlers}>
       {notes.map((note) => (
-        <NoteCard key={note.id} note={note} onMove={onMoveNote} onResize={onResizeNote} />
+        <NoteCard
+          key={note.id}
+          note={note}
+          onMove={onMoveNote}
+          onResize={onResizeNote}
+          onColorChange={onSetNoteColor}
+        />
       ))}
       <div ref={previewRef} className="board__preview" aria-hidden hidden />
     </div>
