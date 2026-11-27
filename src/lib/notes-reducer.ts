@@ -36,6 +36,8 @@ export const notesReducer = (
         width: action.size.width,
         height: action.size.height,
       }));
+    case 'deleteNote':
+      return deleteNote(state, action.id);
     case 'setNoteColor': {
       const note = state.notes.find((candidate) => candidate.id === action.id);
       // Same color: `state` itself, so a click on the current swatch renders nothing.
@@ -47,6 +49,13 @@ export const notesReducer = (
       };
     }
   }
+};
+
+/** Removes one note. An unknown id returns `state` itself, so nothing re-renders. */
+const deleteNote = (state: Notes.NotesState, id: string): Notes.NotesState => {
+  const notes = state.notes.filter((note) => note.id !== id);
+  if (notes.length === state.notes.length) return state;
+  return { ...state, notes };
 };
 
 /**

@@ -13,3 +13,15 @@ export const setElementRect = (element: HTMLElement, rect: Geometry.Rect): void 
   element.style.setProperty('width', `${rect.width}px`);
   element.style.setProperty('height', `${rect.height}px`);
 };
+
+/**
+ * Measures where an element is in the viewport. It forces a layout, so call it
+ * once at gesture start, never on each pointer move.
+ *
+ * @param element - The element to measure
+ * @returns Its border box in viewport (client) coordinates
+ */
+export const getElementClientRect = (element: Element): Geometry.Rect => {
+  const { left, top, width, height } = element.getBoundingClientRect();
+  return { x: left, y: top, width, height };
+};

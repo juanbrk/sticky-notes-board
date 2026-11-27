@@ -31,7 +31,8 @@ export const useDragGesture = ({
   const lastPointRef = useRef<Geometry.Point2d>({ x: 0, y: 0 });
 
   // TODO: cancel on window blur too. A mouse drag gets no `pointercancel` when the
-  // window loses focus, so Alt/Cmd-Tab mid-drag still ends with `onEnd` (deferred bug B1).
+  // window loses focus, so Alt/Cmd-Tab mid-drag still ends with `onEnd`; a note
+  // held over the trash is then deleted (deferred bug B1).
   return useMemo(() => {
     const isActivePointer = (event: PointerEvent) => activePointerIdRef.current === event.pointerId;
 

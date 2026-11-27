@@ -191,4 +191,37 @@ describe('notesReducer', () => {
       expect(notesReducer(state, { type: 'setNoteColor', id: 'b', color: 'yellow' })).toBe(state);
     });
   });
+
+  describe('deleteNote', () => {
+    it('removes only the target note and keeps the references of the others', () => {
+      const state = twoNotes();
+
+      const nextState = notesReducer(state, { type: 'deleteNote', id: 'a' });
+
+      expect(nextState.notes).toHaveLength(1);
+      expect(nextState.notes[0]).toBe(state.notes[1]);
+    });
+
+    it('does not mutate the previous state', () => {
+      const state = twoNotes();
+      const previousNotes = state.notes;
+
+      notesReducer(state, { type: 'deleteNote', id: 'a' });
+
+      expect(state.notes).toBe(previousNotes);
+      expect(state.notes.map((note) => note.id)).toEqual(['a', 'b']);
+    });
+
+    it('returns the same state for an unknown id', () => {
+      const state = twoNotes();
+
+      expect(notesReducer(state, { type: 'deleteNote', id: 'zz' })).toBe(state);
+    });
+
+    it('leaves an empty board after deleting the last note', () => {
+      const withOne = notesReducer(INITIAL_NOTES_STATE, createNote('a'));
+
+      expect(notesReducer(withOne, { type: 'deleteNote', id: 'a' }).notes).toEqual([]);
+    });
+  });
 });
