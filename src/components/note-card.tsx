@@ -49,8 +49,7 @@ const NoteCardView = ({ note, onMove, onResize, onColorChange }: Notes.NoteCardP
 /**
  * A sticky note placed at its position and size on the board; drag it to move
  * it, drag its bottom-right corner to resize it, or pick a swatch to recolor
- * it. Memoised: the reducer keeps
- * untouched notes as the same objects and the callbacks are stable, so a change
- * to one note renders only that card.
+ * it. Memoised: the reducer keeps untouched notes as the same objects and the
+ * callbacks are stable, so a change to one note renders only that card.
  */
 export const NoteCard = memo(NoteCardView);

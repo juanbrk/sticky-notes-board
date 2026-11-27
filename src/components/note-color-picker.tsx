@@ -6,7 +6,7 @@ import './note-color-picker.css';
 
 // The press ends here: if it reached the note, the note would capture the
 // pointer for a move and the swatch would never get its click (N6).
-const stopPointerDown = (event: PointerEvent) => {
+const handlePointerDown = (event: PointerEvent) => {
   event.stopPropagation();
 };
 
@@ -15,7 +15,7 @@ const NoteColorPickerView = ({ noteId, color, onColorChange }: Notes.NoteColorPi
     className="note-color-picker"
     role="group"
     aria-label="Note color"
-    onPointerDown={stopPointerDown}
+    onPointerDown={handlePointerDown}
   >
     {NOTE_COLORS.map((swatchColor) => (
       <button
