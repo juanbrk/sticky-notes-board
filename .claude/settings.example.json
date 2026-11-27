@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $PWD/.claude/hooks/typecheck.js"
+          },
+          {
+            "type": "command",
+            "command": "node $PWD/.claude/hooks/format.js"
+          },
+          {
+            "type": "command",
+            "command": "node $PWD/.claude/hooks/warn-any-in-types.js"
+          }
+        ]
+      }
+    ]
+  }
+}

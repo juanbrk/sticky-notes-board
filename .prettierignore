@@ -1,0 +1,11 @@
+# agent memory, rules and hooks, edited by hooks and tooling, not application code
+.claude/
+
+# markdown is prose; tables and notes are not reflowed by Prettier
+*.md
+
+# build outputs and dependencies
+dist/
+node_modules/
+coverage/
+package-lock.json

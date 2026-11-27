@@ -1,0 +1,35 @@
+# Dependencies and build output
+node_modules
+dist
+dist-ssr
+coverage
+*.tsbuildinfo
+*.log
+*.local
+
+# OS and editors
+.DS_Store
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Environment
+.env
+.env.*
+
+# Claude Code: hooks wiring has absolute paths; local only
+.claude/settings.local.json
+
+# Claude Code skills are personal tooling, not part of the deliverable; copied into each worktree by new-worktree.sh
+.claude/skills/
+
+# Local-only tracking notes (interview preparation), never pushed
+TICKET.md
+roadmap.md
+.claude/memory/memory-decisions.md
+.claude/memory/memory-sessions.md
+.claude/hooks-error-log.md
+
+# The employer's assessment brief is not part of the deliverable
+docs/assessment-brief.md
