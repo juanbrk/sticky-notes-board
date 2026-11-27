@@ -1,11 +1,15 @@
 import type { Ref, RefObject } from 'react';
 
+import type { NOTE_COLORS } from '../lib/note-colors.constants';
 import type * as Geometry from './geometry.types';
 
 // 1. Entities
 
+export type NoteColor = (typeof NOTE_COLORS)[number];
+
 export interface Note extends Geometry.Rect {
   id: string;
+  color: NoteColor;
 }
 
 // 3. Props and hook options
@@ -16,6 +20,13 @@ export interface NoteCardProps {
   onResize: (id: string, size: Geometry.Size) => void;
   onDelete: (id: string) => void;
   trashRef: RefObject<HTMLElement | null>;
+  onColorChange: (id: string, color: NoteColor) => void;
+}
+
+export interface NoteColorPickerProps {
+  noteId: string;
+  color: NoteColor;
+  onColorChange: (id: string, color: NoteColor) => void;
 }
 
 export interface BoardProps {
@@ -23,6 +34,7 @@ export interface BoardProps {
   onCreateNote: (rect: Geometry.Rect) => void;
   onMoveNote: (id: string, position: Geometry.Point2d) => void;
   onResizeNote: (id: string, size: Geometry.Size) => void;
+  onSetNoteColor: (id: string, color: NoteColor) => void;
   onDeleteNote: (id: string) => void;
 }
 
@@ -82,7 +94,13 @@ interface DeleteNote {
   id: string;
 }
 
-export type NotesAction = CreateNote | MoveNote | ResizeNote | DeleteNote;
+interface SetNoteColor {
+  type: 'setNoteColor';
+  id: string;
+  color: NoteColor;
+}
+
+export type NotesAction = CreateNote | MoveNote | ResizeNote | DeleteNote | SetNoteColor;
 
 // 5. State
 
@@ -97,4 +115,5 @@ export interface NotesStore {
   moveNote: (id: string, position: Geometry.Point2d) => void;
   resizeNote: (id: string, size: Geometry.Size) => void;
   deleteNote: (id: string) => void;
+  setNoteColor: (id: string, color: NoteColor) => void;
 }

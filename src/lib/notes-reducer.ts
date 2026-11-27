@@ -1,5 +1,6 @@
 import * as GeometryUtils from '../helpers/geometry.helpers';
 import type * as Notes from '../types/notes.types';
+import { DEFAULT_NOTE_COLOR } from './note-colors.constants';
 
 export const INITIAL_NOTES_STATE: Notes.NotesState = { notes: [] };
 
@@ -19,7 +20,10 @@ export const notesReducer = (
 ): Notes.NotesState => {
   switch (action.type) {
     case 'createNote':
-      return { ...state, notes: [...state.notes, { id: action.id, ...action.rect }] };
+      return {
+        ...state,
+        notes: [...state.notes, { id: action.id, ...action.rect, color: DEFAULT_NOTE_COLOR }],
+      };
     case 'moveNote':
       return updateNoteRect(state, action.id, (note) => ({
         ...note,
@@ -34,6 +38,16 @@ export const notesReducer = (
       }));
     case 'deleteNote':
       return deleteNote(state, action.id);
+    case 'setNoteColor': {
+      const note = state.notes.find((candidate) => candidate.id === action.id);
+      // Same color: `state` itself, so a click on the current swatch renders nothing.
+      if (!note || note.color === action.color) return state;
+      const nextNote = { ...note, color: action.color };
+      return {
+        ...state,
+        notes: state.notes.map((candidate) => (candidate === note ? nextNote : candidate)),
+      };
+    }
   }
 };
 

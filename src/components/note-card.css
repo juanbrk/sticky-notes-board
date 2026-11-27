@@ -1,6 +1,6 @@
 .note-card {
   position: absolute;
-  background: var(--color-note);
+  background: var(--note-color);
   border-radius: var(--radius-note);
   box-shadow: var(--shadow-note);
   cursor: grab;
@@ -46,4 +46,22 @@
 .note-card:hover .note-card__resize-handle,
 .note-card[data-gesture='resize'] .note-card__resize-handle {
   opacity: 1;
+}
+
+/* Hidden picker ignores the pointer, so a tiny note's overflowing row never
+   blocks a press on the board or a note beneath it. Tab still reaches it. */
+.note-card .note-color-picker {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.note-card:hover .note-color-picker,
+.note-card:has(:focus-visible) .note-color-picker {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.note-card[data-gesture] .note-color-picker {
+  opacity: 0;
+  pointer-events: none;
 }

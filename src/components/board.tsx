@@ -22,6 +22,7 @@ export const Board = ({
   onMoveNote,
   onResizeNote,
   onDeleteNote,
+  onSetNoteColor,
 }: Notes.BoardProps) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -100,6 +101,7 @@ export const Board = ({
           onResize={onResizeNote}
           onDelete={onDeleteNote}
           trashRef={trashRef}
+          onColorChange={onSetNoteColor}
         />
       ))}
       <div ref={previewRef} className="board__preview" aria-hidden hidden />

@@ -10,7 +10,11 @@
   --color-page-bg: #e9e7e1;
   --color-board-bg: #fbfaf7;
   --color-board-border: #c8c4b9;
-  --color-note: #fff740;
+  --color-note-yellow: #fff740;
+  --color-note-pink: #ffc8dd;
+  --color-note-blue: #bde0fe;
+  --color-note-green: #caf0c4;
+  --color-note-orange: #ffd8a8;
   --color-note-preview: rgb(255 247 64 / 50%);
   --color-note-preview-outline: #a39a1c;
   --color-note-grip: rgb(0 0 0 / 28%);
@@ -19,9 +23,35 @@
   --color-trash-border: #b5b0a4;
   --color-trash-armed: #b42318;
   --color-trash-armed-bg: #fdecea;
+  --color-note-toolbar-bg: rgb(255 255 255 / 72%);
+  --color-swatch-border: rgb(0 0 0 / 30%);
+  --color-focus: #1a5fd1;
 
   --shadow-note: 0 1px 2px rgb(0 0 0 / 14%), 0 4px 10px rgb(0 0 0 / 10%);
   --shadow-note-dragging: 0 2px 4px rgb(0 0 0 / 16%), 0 10px 24px rgb(0 0 0 / 18%);
+  --shadow-note-toolbar: 0 1px 2px rgb(0 0 0 / 18%);
+}
+
+/* The one place a palette id becomes a color: a note and its swatch both read
+   --note-color, so they cannot disagree. Ids come from NOTE_COLORS. */
+[data-note-color='yellow'] {
+  --note-color: var(--color-note-yellow);
+}
+
+[data-note-color='pink'] {
+  --note-color: var(--color-note-pink);
+}
+
+[data-note-color='blue'] {
+  --note-color: var(--color-note-blue);
+}
+
+[data-note-color='green'] {
+  --note-color: var(--color-note-green);
+}
+
+[data-note-color='orange'] {
+  --note-color: var(--color-note-orange);
 }
 
 *,
