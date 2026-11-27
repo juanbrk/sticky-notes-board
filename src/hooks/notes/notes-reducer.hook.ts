@@ -25,5 +25,9 @@ export const useNotesReducer = (): Notes.NotesStore => {
     dispatch({ type: 'resizeNote', id, size });
   }, []);
 
-  return { notes: state.notes, createNote, moveNote, resizeNote };
+  const setNoteColor = useCallback((id: string, color: Notes.NoteColor) => {
+    dispatch({ type: 'setNoteColor', id, color });
+  }, []);
+
+  return { notes: state.notes, createNote, moveNote, resizeNote, setNoteColor };
 };

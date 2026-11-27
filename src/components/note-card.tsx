@@ -5,6 +5,7 @@ import { useDragNote } from '../hooks/notes/drag-note.hook';
 import { BOARD_SIZE, MIN_NOTE_SIZE } from '../lib/board.constants';
 import type * as Notes from '../types/notes.types';
 import './note-card.css';
+import { NoteColorPicker } from './note-color-picker';
 
 const getMovedNoteRect: Notes.NoteRectTransform = (start, delta) =>
   GeometryUtils.getMovedRect(start, delta, BOARD_SIZE);
@@ -12,7 +13,7 @@ const getMovedNoteRect: Notes.NoteRectTransform = (start, delta) =>
 const getResizedNoteRect: Notes.NoteRectTransform = (start, delta) =>
   GeometryUtils.getResizedRect(start, delta, MIN_NOTE_SIZE, BOARD_SIZE);
 
-const NoteCardView = ({ note, onMove, onResize }: Notes.NoteCardProps) => {
+const NoteCardView = ({ note, onMove, onResize, onColorChange }: Notes.NoteCardProps) => {
   const elementRef = useRef<HTMLDivElement>(null);
 
   const moveHandlers = useDragNote({
@@ -36,8 +37,10 @@ const NoteCardView = ({ note, onMove, onResize }: Notes.NoteCardProps) => {
       ref={elementRef}
       className="note-card"
       style={{ left: note.x, top: note.y, width: note.width, height: note.height }}
+      data-note-color={note.color}
       {...moveHandlers}
     >
+      <NoteColorPicker noteId={note.id} color={note.color} onColorChange={onColorChange} />
       <div className="note-card__resize-handle" aria-hidden {...resizeHandlers} />
     </div>
   );
@@ -45,7 +48,8 @@ const NoteCardView = ({ note, onMove, onResize }: Notes.NoteCardProps) => {
 
 /**
  * A sticky note placed at its position and size on the board; drag it to move
- * it, or drag its bottom-right corner to resize it. Memoised: the reducer keeps
+ * it, drag its bottom-right corner to resize it, or pick a swatch to recolor
+ * it. Memoised: the reducer keeps
  * untouched notes as the same objects and the callbacks are stable, so a change
  * to one note renders only that card.
  */
