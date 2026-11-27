@@ -12,8 +12,10 @@ import { useDragGesture } from '../gestures/drag-gesture.hook';
  * Drags an existing note to change its rect: moving it or resizing it,
  * depending on `getNextRect`. While the pointer moves, the rect is written
  * straight to the note's element; the store changes once, on release, and only
- * if the rect changed. A release within the drag threshold, or a cancel, puts
- * the element back where the note is, since React will not: its props did not change.
+ * if the rect changed. A press that never moves past the drag threshold, or a
+ * cancel, puts the element back where the note is, since React will not: its
+ * props did not change. Once past the threshold the drag stays a drag, so the
+ * note can come back to within a few pixels of where it started.
  *
  * During the drag the element carries `data-gesture`, so CSS can style it
  * without a render.
@@ -33,13 +35,21 @@ export const useDragNote = ({
   onCommit,
 }: Notes.DragNoteOptions): Gesture.DragGestureHandlers => {
   const pressPointRef = useRef<Geometry.Point2d>({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
+
+  const updateIsDragging = useCallback((clientPoint: Geometry.Point2d) => {
+    if (isDraggingRef.current) return;
+    isDraggingRef.current = GeometryUtils.isBeyondDragThreshold(
+      pressPointRef.current,
+      clientPoint,
+      DRAG_THRESHOLD_PX
+    );
+  }, []);
 
   const getDraggedRect = useCallback(
     (clientPoint: Geometry.Point2d): Geometry.Rect => {
+      if (!isDraggingRef.current) return note;
       const pressPoint = pressPointRef.current;
-      if (!GeometryUtils.isBeyondDragThreshold(pressPoint, clientPoint, DRAG_THRESHOLD_PX)) {
-        return note;
-      }
       const delta = { x: clientPoint.x - pressPoint.x, y: clientPoint.y - pressPoint.y };
       return getNextRect(note, delta);
     },
@@ -60,6 +70,7 @@ export const useDragNote = ({
   const handleDragStart = useCallback(
     (clientOrigin: Geometry.Point2d) => {
       pressPointRef.current = clientOrigin;
+      isDraggingRef.current = false;
       elementRef.current?.setAttribute('data-gesture', gesture);
     },
     [elementRef, gesture]
@@ -67,19 +78,21 @@ export const useDragNote = ({
 
   const handleDragMove = useCallback(
     (clientPoint: Geometry.Point2d) => {
+      updateIsDragging(clientPoint);
       showRect(getDraggedRect(clientPoint));
     },
-    [getDraggedRect, showRect]
+    [getDraggedRect, showRect, updateIsDragging]
   );
 
   const handleDragEnd = useCallback(
     (clientPoint: Geometry.Point2d) => {
       clearGesture();
+      updateIsDragging(clientPoint);
       const rect = getDraggedRect(clientPoint);
       showRect(rect);
       if (!GeometryUtils.isSameRect(rect, note)) onCommit(note.id, rect);
     },
-    [clearGesture, getDraggedRect, note, onCommit, showRect]
+    [clearGesture, getDraggedRect, note, onCommit, showRect, updateIsDragging]
   );
 
   const handleDragCancel = useCallback(() => {

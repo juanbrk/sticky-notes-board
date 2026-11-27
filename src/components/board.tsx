@@ -47,7 +47,11 @@ export const Board = ({ notes, onCreateNote, onMoveNote, onResizeNote }: Notes.B
     // so the border width is added to the border-box corner.
     const bounds = board.getBoundingClientRect();
     boardOriginRef.current = { x: bounds.left + board.clientLeft, y: bounds.top + board.clientTop };
-    dragStartRef.current = GeometryUtils.getLocalPoint(clientOrigin, boardOriginRef.current);
+    // Clamped like the current point: a press on the board's border lands just outside it.
+    dragStartRef.current = GeometryUtils.clampPoint(
+      GeometryUtils.getLocalPoint(clientOrigin, boardOriginRef.current),
+      BOARD_SIZE
+    );
   }, []);
 
   const handleDragMove = useCallback(
