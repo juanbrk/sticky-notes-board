@@ -19,6 +19,11 @@
   cursor: nwse-resize;
 }
 
+/* Set by useDragNote while releasing the move would delete the note. */
+.note-card[data-drop='armed'] {
+  opacity: 0.5;
+}
+
 .note-card__resize-handle {
   position: absolute;
   right: 0;

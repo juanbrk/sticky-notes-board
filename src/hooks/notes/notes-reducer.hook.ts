@@ -25,5 +25,9 @@ export const useNotesReducer = (): Notes.NotesStore => {
     dispatch({ type: 'resizeNote', id, size });
   }, []);
 
-  return { notes: state.notes, createNote, moveNote, resizeNote };
+  const deleteNote = useCallback((id: string) => {
+    dispatch({ type: 'deleteNote', id });
+  }, []);
+
+  return { notes: state.notes, createNote, moveNote, resizeNote, deleteNote };
 };

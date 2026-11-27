@@ -72,6 +72,45 @@ describe('clampPoint', () => {
   });
 });
 
+describe('isPointInRect', () => {
+  const rect = { x: 100, y: 50, width: 80, height: 40 };
+
+  it('is true for a point inside', () => {
+    expect(GeometryUtils.isPointInRect({ x: 140, y: 70 }, rect)).toBe(true);
+  });
+
+  it.each([
+    ['left', { x: 100, y: 70 }],
+    ['right', { x: 180, y: 70 }],
+    ['top', { x: 140, y: 50 }],
+    ['bottom', { x: 140, y: 90 }],
+  ])('is true for a point on the %s edge', (_edge, point) => {
+    expect(GeometryUtils.isPointInRect(point, rect)).toBe(true);
+  });
+
+  it.each([
+    ['left', { x: 99, y: 70 }],
+    ['right', { x: 181, y: 70 }],
+    ['top', { x: 140, y: 49 }],
+    ['bottom', { x: 140, y: 91 }],
+  ])('is false for a point 1px past the %s edge', (_edge, point) => {
+    expect(GeometryUtils.isPointInRect(point, rect)).toBe(false);
+  });
+
+  describe('a rect that reaches without end to the right and down', () => {
+    const corner = { x: 100, y: 50, width: Infinity, height: Infinity };
+
+    it('is true for a point far past its corner', () => {
+      expect(GeometryUtils.isPointInRect({ x: 1e6, y: 1e6 }, corner)).toBe(true);
+    });
+
+    it('is still false above or to the left of its corner', () => {
+      expect(GeometryUtils.isPointInRect({ x: 99, y: 1e6 }, corner)).toBe(false);
+      expect(GeometryUtils.isPointInRect({ x: 1e6, y: 49 }, corner)).toBe(false);
+    });
+  });
+});
+
 describe('isSameRect', () => {
   const rect = { x: 1, y: 2, width: 3, height: 4 };
 

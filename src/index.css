@@ -1,6 +1,10 @@
 :root {
   --radius-board: 4px;
   --radius-note: 2px;
+  --radius-trash: 6px;
+
+  /* The trash is drawn above every note, so a note can never hide it. */
+  --z-trash: 1;
 
   --color-text: #2b2a27;
   --color-page-bg: #e9e7e1;
@@ -10,6 +14,11 @@
   --color-note-preview: rgb(255 247 64 / 50%);
   --color-note-preview-outline: #a39a1c;
   --color-note-grip: rgb(0 0 0 / 28%);
+  --color-trash: #6f6a60;
+  --color-trash-bg: rgb(251 250 247 / 90%);
+  --color-trash-border: #b5b0a4;
+  --color-trash-armed: #b42318;
+  --color-trash-armed-bg: #fdecea;
 
   --shadow-note: 0 1px 2px rgb(0 0 0 / 14%), 0 4px 10px rgb(0 0 0 / 10%);
   --shadow-note-dragging: 0 2px 4px rgb(0 0 0 / 16%), 0 10px 24px rgb(0 0 0 / 18%);

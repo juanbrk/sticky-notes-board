@@ -12,7 +12,7 @@ const getMovedNoteRect: Notes.NoteRectTransform = (start, delta) =>
 const getResizedNoteRect: Notes.NoteRectTransform = (start, delta) =>
   GeometryUtils.getResizedRect(start, delta, MIN_NOTE_SIZE, BOARD_SIZE);
 
-const NoteCardView = ({ note, onMove, onResize }: Notes.NoteCardProps) => {
+const NoteCardView = ({ note, onMove, onResize, onDelete, trashRef }: Notes.NoteCardProps) => {
   const elementRef = useRef<HTMLDivElement>(null);
 
   const moveHandlers = useDragNote({
@@ -21,6 +21,7 @@ const NoteCardView = ({ note, onMove, onResize }: Notes.NoteCardProps) => {
     gesture: 'move',
     getNextRect: getMovedNoteRect,
     onCommit: onMove,
+    dropTarget: { ref: trashRef, onDrop: onDelete },
   });
 
   const resizeHandlers = useDragNote({
@@ -45,7 +46,8 @@ const NoteCardView = ({ note, onMove, onResize }: Notes.NoteCardProps) => {
 
 /**
  * A sticky note placed at its position and size on the board; drag it to move
- * it, or drag its bottom-right corner to resize it. Memoised: the reducer keeps
+ * it, drop it on the trash to delete it, or drag its bottom-right corner to
+ * resize it. Only the move can delete, so a resize never does. Memoised: the reducer keeps
  * untouched notes as the same objects and the callbacks are stable, so a change
  * to one note renders only that card.
  */

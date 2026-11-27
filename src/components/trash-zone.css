@@ -1,0 +1,67 @@
+.trash-zone {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: var(--z-trash);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  color: var(--color-trash);
+  background: var(--color-trash-bg);
+  border: 1px dashed var(--color-trash-border);
+  border-radius: var(--radius-trash);
+  /* A press here does nothing, so neither the board's crosshair nor a grab cursor applies. */
+  cursor: default;
+  transform-origin: bottom right;
+  transition:
+    opacity 120ms ease-out,
+    visibility 120ms,
+    transform 120ms ease-out;
+}
+
+/* Every state below is derived from what is already on the DOM (the dragged
+   note's data-drop or data-gesture, the create preview's hidden flag), so the
+   trash never holds state of its own that a gesture would have to clear. */
+
+.board:has(.note-card[data-drop]) .trash-zone {
+  color: var(--color-text);
+  border-style: solid;
+  border-color: var(--color-trash);
+}
+
+.board:has(.note-card[data-drop='armed']) .trash-zone {
+  color: var(--color-trash-armed);
+  background: var(--color-trash-armed-bg);
+  border-color: var(--color-trash-armed);
+  transform: scale(1.06);
+}
+
+/* The trash is drawn above the note, so without this it would show its own cursor. */
+.board:has(.note-card[data-gesture='move']) .trash-zone {
+  cursor: grabbing;
+}
+
+/* Hidden while a new note is being drawn, so it never covers the preview. */
+.board:has(.board__preview:not([hidden])) .trash-zone {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trash-zone {
+    transition: none;
+  }
+}
+
+.trash-zone__icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

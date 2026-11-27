@@ -8,15 +8,24 @@ import type * as Geometry from '../types/geometry.types';
 import type * as Notes from '../types/notes.types';
 import './board.css';
 import { NoteCard } from './note-card';
+import { TrashZone } from './trash-zone';
 
 /**
- * Fixed-size board where dragging on empty space creates a note. The live
- * preview is written straight to the DOM through a ref, so a drag costs no
- * React renders; the board state changes once, on release.
+ * Fixed-size board where dragging on empty space creates a note, with the
+ * trash zone in its bottom-right corner. The live preview is written straight
+ * to the DOM through a ref, so a drag costs no React renders; the board state
+ * changes once, on release.
  */
-export const Board = ({ notes, onCreateNote, onMoveNote, onResizeNote }: Notes.BoardProps) => {
+export const Board = ({
+  notes,
+  onCreateNote,
+  onMoveNote,
+  onResizeNote,
+  onDeleteNote,
+}: Notes.BoardProps) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+  const trashRef = useRef<HTMLDivElement>(null);
   const boardOriginRef = useRef<Geometry.Point2d>({ x: 0, y: 0 });
   const dragStartRef = useRef<Geometry.Point2d>({ x: 0, y: 0 });
 
@@ -84,9 +93,17 @@ export const Board = ({ notes, onCreateNote, onMoveNote, onResizeNote }: Notes.B
   return (
     <div ref={boardRef} className="board" style={BOARD_SIZE} {...dragHandlers}>
       {notes.map((note) => (
-        <NoteCard key={note.id} note={note} onMove={onMoveNote} onResize={onResizeNote} />
+        <NoteCard
+          key={note.id}
+          note={note}
+          onMove={onMoveNote}
+          onResize={onResizeNote}
+          onDelete={onDeleteNote}
+          trashRef={trashRef}
+        />
       ))}
       <div ref={previewRef} className="board__preview" aria-hidden hidden />
+      <TrashZone ref={trashRef} />
     </div>
   );
 };

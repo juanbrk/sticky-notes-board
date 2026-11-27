@@ -69,6 +69,25 @@ export const clampPoint = (point: Geometry.Point2d, bounds: Geometry.Size): Geom
 });
 
 /**
+ * Tells whether a point lies inside a rectangle, edges included. A rectangle
+ * with an `Infinity` width or height reaches without end to the right or down,
+ * so a hit area can cover everything past a corner.
+ *
+ * @param point - A point in the same coordinates as `rect`
+ * @param rect - The area to test against
+ * @returns `true` when the point is inside the rectangle or on one of its edges
+ *
+ * @example
+ * isPointInRect({ x: 50, y: 20 }, { x: 0, y: 0, width: 50, height: 40 });
+ * // true (on the right edge)
+ */
+export const isPointInRect = (point: Geometry.Point2d, rect: Geometry.Rect): boolean =>
+  point.x >= rect.x &&
+  point.x <= rect.x + rect.width &&
+  point.y >= rect.y &&
+  point.y <= rect.y + rect.height;
+
+/**
  * Tells whether two rectangles have the same position and size.
  *
  * @param a - A rectangle

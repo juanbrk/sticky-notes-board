@@ -32,7 +32,16 @@ export const notesReducer = (
         width: action.size.width,
         height: action.size.height,
       }));
+    case 'deleteNote':
+      return deleteNote(state, action.id);
   }
+};
+
+/** Removes one note. An unknown id returns `state` itself, so nothing re-renders. */
+const deleteNote = (state: Notes.NotesState, id: string): Notes.NotesState => {
+  const notes = state.notes.filter((note) => note.id !== id);
+  if (notes.length === state.notes.length) return state;
+  return { ...state, notes };
 };
 
 /**
