@@ -13,12 +13,14 @@ export interface Note extends Geometry.Rect {
 export interface NoteCardProps {
   note: Note;
   onMove: (id: string, position: Geometry.Point2d) => void;
+  onResize: (id: string, size: Geometry.Size) => void;
 }
 
 export interface BoardProps {
   notes: readonly Note[];
   onCreateNote: (rect: Geometry.Rect) => void;
   onMoveNote: (id: string, position: Geometry.Point2d) => void;
+  onResizeNote: (id: string, size: Geometry.Size) => void;
 }
 
 /** Which drag a note is going through; styled through the note's `data-gesture` attribute. */
