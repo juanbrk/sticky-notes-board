@@ -1,9 +1,11 @@
 .board {
   position: relative;
   flex: none;
-  width: var(--board-width);
-  height: var(--board-height);
-  /* Notes are not clamped yet (nice-to-have N4): what overflows the board is clipped. */
+  /* Width and height come from BOARD_SIZE. content-box makes them the area notes
+     are clamped to; with border-box the border would eat into it. */
+  box-sizing: content-box;
+  /* Every gesture keeps notes inside the board; this only clips one that arrives from
+     outside it, such as stored data. */
   overflow: hidden;
   background: var(--color-board-bg);
   border: 1px solid var(--color-board-border);

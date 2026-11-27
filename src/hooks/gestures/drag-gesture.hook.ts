@@ -10,7 +10,7 @@ import type * as Gesture from '../../types/gesture.types';
  *
  * The element captures the pointer on press, so moves and the release keep
  * arriving even when the pointer leaves it. A `pointercancel`, or the element
- * losing capture mid-gesture, ends the gesture with `onCancel`.
+ * losing capture while the button is still held, ends the gesture with `onCancel`.
  *
  * Pass stable callbacks (`useCallback`): the returned handlers are memoised on them.
  *
@@ -28,6 +28,7 @@ export const useDragGesture = ({
   onCancel,
 }: Gesture.DragGestureCallbacks): Gesture.DragGestureHandlers => {
   const activePointerIdRef = useRef<number | null>(null);
+  const lastPointRef = useRef<Geometry.Point2d>({ x: 0, y: 0 });
 
   // TODO: cancel on window blur too. A mouse drag gets no `pointercancel` when the
   // window loses focus, so Alt/Cmd-Tab mid-drag still ends with `onEnd` (deferred bug B1).
@@ -40,6 +41,19 @@ export const useDragGesture = ({
       onCancel();
     };
 
+    // HACK: Chrome sometimes fires `lostpointercapture` before `pointerup`. With no
+    // button held the user has already let go, so the drag ends where the pointer
+    // last was instead of being cancelled; the late `pointerup` is then ignored.
+    const handleLostCapture = (event: PointerEvent) => {
+      if (!isActivePointer(event)) return;
+      if (event.buttons !== 0) {
+        handleCancel(event);
+        return;
+      }
+      activePointerIdRef.current = null;
+      onEnd(lastPointRef.current);
+    };
+
     return {
       onPointerDown: (event) => {
         const isPrimaryPress = event.isPrimary && event.button === 0;
@@ -47,11 +61,13 @@ export const useDragGesture = ({
         if (!isPrimaryPress || isGestureActive) return;
         event.currentTarget.setPointerCapture(event.pointerId);
         activePointerIdRef.current = event.pointerId;
-        onStart(getClientPoint(event));
+        lastPointRef.current = getClientPoint(event);
+        onStart(lastPointRef.current);
       },
       onPointerMove: (event) => {
         if (!isActivePointer(event)) return;
-        onMove(getClientPoint(event));
+        lastPointRef.current = getClientPoint(event);
+        onMove(lastPointRef.current);
       },
       onPointerUp: (event) => {
         if (!isActivePointer(event)) return;
@@ -61,7 +77,7 @@ export const useDragGesture = ({
         onEnd(getClientPoint(event));
       },
       onPointerCancel: handleCancel,
-      onLostPointerCapture: handleCancel,
+      onLostPointerCapture: handleLostCapture,
     };
   }, [onStart, onMove, onEnd, onCancel]);
 };

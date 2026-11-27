@@ -2,27 +2,29 @@ import { useCallback, useRef } from 'react';
 
 import * as GeometryUtils from '../helpers/geometry.helpers';
 import { useDragGesture } from '../hooks/gestures/drag-gesture.hook';
+import { BOARD_SIZE, DRAG_THRESHOLD_PX } from '../lib/board.constants';
+import { setElementRect } from '../lib/element-rect';
 import type * as Geometry from '../types/geometry.types';
 import type * as Notes from '../types/notes.types';
 import './board.css';
 import { NoteCard } from './note-card';
-
-// Business rule: a press that moves this far or less is a click and creates nothing.
-const DRAG_THRESHOLD_PX = 4;
 
 /**
  * Fixed-size board where dragging on empty space creates a note. The live
  * preview is written straight to the DOM through a ref, so a drag costs no
  * React renders; the board state changes once, on release.
  */
-export const Board = ({ notes, onCreateNote }: Notes.BoardProps) => {
+export const Board = ({ notes, onCreateNote, onMoveNote, onResizeNote }: Notes.BoardProps) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const boardOriginRef = useRef<Geometry.Point2d>({ x: 0, y: 0 });
   const dragStartRef = useRef<Geometry.Point2d>({ x: 0, y: 0 });
 
   const getDraftRect = useCallback((clientPoint: Geometry.Point2d): Geometry.Rect | null => {
-    const current = GeometryUtils.getLocalPoint(clientPoint, boardOriginRef.current);
+    const current = GeometryUtils.clampPoint(
+      GeometryUtils.getLocalPoint(clientPoint, boardOriginRef.current),
+      BOARD_SIZE
+    );
     const isDrag = GeometryUtils.isBeyondDragThreshold(
       dragStartRef.current,
       current,
@@ -35,11 +37,7 @@ export const Board = ({ notes, onCreateNote }: Notes.BoardProps) => {
     const preview = previewRef.current;
     if (!preview) return;
     preview.hidden = rect === null;
-    if (rect === null) return;
-    preview.style.left = `${rect.x}px`;
-    preview.style.top = `${rect.y}px`;
-    preview.style.width = `${rect.width}px`;
-    preview.style.height = `${rect.height}px`;
+    if (rect) setElementRect(preview, rect);
   }, []);
 
   const handleDragStart = useCallback((clientOrigin: Geometry.Point2d) => {
@@ -49,7 +47,11 @@ export const Board = ({ notes, onCreateNote }: Notes.BoardProps) => {
     // so the border width is added to the border-box corner.
     const bounds = board.getBoundingClientRect();
     boardOriginRef.current = { x: bounds.left + board.clientLeft, y: bounds.top + board.clientTop };
-    dragStartRef.current = GeometryUtils.getLocalPoint(clientOrigin, boardOriginRef.current);
+    // Clamped like the current point: a press on the board's border lands just outside it.
+    dragStartRef.current = GeometryUtils.clampPoint(
+      GeometryUtils.getLocalPoint(clientOrigin, boardOriginRef.current),
+      BOARD_SIZE
+    );
   }, []);
 
   const handleDragMove = useCallback(
@@ -80,9 +82,9 @@ export const Board = ({ notes, onCreateNote }: Notes.BoardProps) => {
   });
 
   return (
-    <div ref={boardRef} className="board" {...dragHandlers}>
+    <div ref={boardRef} className="board" style={BOARD_SIZE} {...dragHandlers}>
       {notes.map((note) => (
-        <NoteCard key={note.id} note={note} />
+        <NoteCard key={note.id} note={note} onMove={onMoveNote} onResize={onResizeNote} />
       ))}
       <div ref={previewRef} className="board__preview" aria-hidden hidden />
     </div>

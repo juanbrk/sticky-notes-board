@@ -3,4 +3,42 @@
   background: var(--color-note);
   border-radius: var(--radius-note);
   box-shadow: var(--shadow-note);
+  cursor: grab;
+}
+
+/* Set by useDragNote for the length of a drag. */
+.note-card[data-gesture] {
+  box-shadow: var(--shadow-note-dragging);
+}
+
+.note-card[data-gesture='move'] {
+  cursor: grabbing;
+}
+
+.note-card[data-gesture='resize'] {
+  cursor: nwse-resize;
+}
+
+.note-card__resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  cursor: nwse-resize;
+  /* Two diagonal strokes, drawn instead of an icon so the grip scales with no asset. */
+  background: linear-gradient(
+    135deg,
+    transparent 0 50%,
+    var(--color-note-grip) 50% 58%,
+    transparent 58% 72%,
+    var(--color-note-grip) 72% 80%,
+    transparent 80%
+  );
+  opacity: 0;
+}
+
+.note-card:hover .note-card__resize-handle,
+.note-card[data-gesture='resize'] .note-card__resize-handle {
+  opacity: 1;
 }
