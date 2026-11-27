@@ -9,8 +9,8 @@ import type * as Gesture from '../../types/gesture.types';
  * and resizing notes can all build on it.
  *
  * The element captures the pointer on press, so moves and the release keep
- * arriving even when the pointer leaves it. A `pointercancel`, or capture lost
- * mid-gesture (window blur, element removed), ends the gesture with `onCancel`.
+ * arriving even when the pointer leaves it. A `pointercancel`, or the element
+ * losing capture mid-gesture, ends the gesture with `onCancel`.
  *
  * Pass stable callbacks (`useCallback`): the returned handlers are memoised on them.
  *
@@ -29,6 +29,8 @@ export const useDragGesture = ({
 }: Gesture.DragGestureCallbacks): Gesture.DragGestureHandlers => {
   const activePointerIdRef = useRef<number | null>(null);
 
+  // TODO: cancel on window blur too. A mouse drag gets no `pointercancel` when the
+  // window loses focus, so Alt/Cmd-Tab mid-drag still ends with `onEnd` (deferred bug B1).
   return useMemo(() => {
     const isActivePointer = (event: PointerEvent) => activePointerIdRef.current === event.pointerId;
 
@@ -41,7 +43,8 @@ export const useDragGesture = ({
     return {
       onPointerDown: (event) => {
         const isPrimaryPress = event.isPrimary && event.button === 0;
-        if (!isPrimaryPress || activePointerIdRef.current !== null) return;
+        const isGestureActive = activePointerIdRef.current !== null;
+        if (!isPrimaryPress || isGestureActive) return;
         event.currentTarget.setPointerCapture(event.pointerId);
         activePointerIdRef.current = event.pointerId;
         onStart(getClientPoint(event));

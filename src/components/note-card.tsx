@@ -10,4 +10,9 @@ const NoteCardView = ({ note }: Notes.NoteCardProps) => (
   />
 );
 
+/**
+ * A sticky note placed at its position and size on the board. Memoised: the
+ * reducer keeps untouched notes as the same objects, so adding a note renders
+ * only the new card.
+ */
 export const NoteCard = memo(NoteCardView);

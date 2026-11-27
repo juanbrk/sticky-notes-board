@@ -2,6 +2,7 @@ import { useNotesReducer } from '../hooks/notes/notes-reducer.hook';
 import './app.css';
 import { Board } from './board';
 
+/** Root of the app: owns the notes store and hands it to the board. */
 export const App = () => {
   const { notes, createNote } = useNotesReducer();
 
