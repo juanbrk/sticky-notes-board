@@ -81,10 +81,12 @@ const NoteCardView = ({
     [note.id, onStartEditing]
   );
 
-  // Tab reaches the read-only text too, and focusing it starts editing.
+  // Tab reaches the read-only text too, and focusing it starts editing. No
+  // press raises a note reached by Tab, so focus brings it to the front itself.
   const handleTextFocus = useCallback(() => {
+    onBringToFront(note.id);
     onStartEditing(note.id);
-  }, [note.id, onStartEditing]);
+  }, [note.id, onBringToFront, onStartEditing]);
 
   const handleTextBlur = useCallback(() => {
     onStopEditing(note.id);
@@ -101,14 +103,14 @@ const NoteCardView = ({
   // is banned by lint and would only run on mount). Leaving it scrolls back to
   // the top, since read mode shows the start of a long text.
   useEffect(() => {
-    const text = textRef.current;
-    if (!text) return;
+    const textArea = textRef.current;
+    if (!textArea) return;
     if (!isEditing) {
-      text.scrollTop = 0;
+      textArea.scrollTop = 0;
       return;
     }
-    text.focus();
-    text.setSelectionRange(text.value.length, text.value.length);
+    textArea.focus();
+    textArea.setSelectionRange(textArea.value.length, textArea.value.length);
   }, [isEditing]);
 
   return (
