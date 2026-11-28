@@ -11,8 +11,10 @@ import type * as Gesture from '../../types/gesture.types';
  * The element captures the pointer on press, so moves and the release keep
  * arriving even when the pointer leaves it. The gesture ends with `onCancel` on a
  * `pointercancel`, when the element loses capture while the button is still held,
- * or when the window loses focus mid-drag (Alt/Cmd-Tab): a mouse gets no
- * `pointercancel` then, only a `pointerup` the browser sends after the `blur`.
+ * when the window loses focus mid-drag (Alt/Cmd-Tab; a mouse gets no
+ * `pointercancel` then, only a `pointerup` after the `blur`), or on Esc, heard on
+ * `window` because the pressed element usually has no keyboard focus. After a
+ * cancel the press is spent: moves and the release are ignored until a fresh press.
  *
  * Pass stable callbacks (`useCallback`): the returned handlers are memoised on them.
  *
@@ -31,8 +33,8 @@ export const useDragGesture = ({
 }: Gesture.DragGestureCallbacks): Gesture.DragGestureHandlers => {
   const activePointerIdRef = useRef<number | null>(null);
   const lastPointRef = useRef<Geometry.Point2d>({ x: 0, y: 0 });
-  const windowBlurAbortRef = useRef<AbortController | null>(null);
-  // The blur listener is added during the press, but bring-to-front hands this
+  const windowListenersAbortRef = useRef<AbortController | null>(null);
+  // The window listeners are added during the press, but bring-to-front hands this
   // hook new callbacks right after it; reading through a ref avoids a stale one.
   const onCancelRef = useRef(onCancel);
 
@@ -42,7 +44,7 @@ export const useDragGesture = ({
 
   useEffect(
     () => () => {
-      windowBlurAbortRef.current?.abort();
+      windowListenersAbortRef.current?.abort();
     },
     []
   );
@@ -52,13 +54,17 @@ export const useDragGesture = ({
 
     const finishGesture = () => {
       activePointerIdRef.current = null;
-      windowBlurAbortRef.current?.abort();
-      windowBlurAbortRef.current = null;
+      windowListenersAbortRef.current?.abort();
+      windowListenersAbortRef.current = null;
     };
 
     const cancelGesture = () => {
       finishGesture();
       onCancelRef.current();
+    };
+
+    const handleWindowKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') cancelGesture();
     };
 
     const handleCancel = (event: PointerEvent) => {
@@ -86,10 +92,9 @@ export const useDragGesture = ({
         if (!isPrimaryPress || isGestureActive) return;
         event.currentTarget.setPointerCapture(event.pointerId);
         activePointerIdRef.current = event.pointerId;
-        windowBlurAbortRef.current = new AbortController();
-        window.addEventListener('blur', cancelGesture, {
-          signal: windowBlurAbortRef.current.signal,
-        });
+        const { signal } = (windowListenersAbortRef.current = new AbortController());
+        window.addEventListener('blur', cancelGesture, { signal });
+        window.addEventListener('keydown', handleWindowKeyDown, { signal });
         lastPointRef.current = getClientPoint(event);
         onStart(lastPointRef.current);
       },
