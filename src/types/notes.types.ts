@@ -12,6 +12,7 @@ export interface Note extends Geometry.Rect {
   /** Paint order among the notes; the highest is on top. Unique, but not contiguous. */
   z: number;
   color: NoteColor;
+  text: string;
 }
 
 // 3. Props and hook options
@@ -24,6 +25,10 @@ export interface NoteCardProps {
   trashRef: RefObject<HTMLElement | null>;
   onColorChange: (id: string, color: NoteColor) => void;
   onBringToFront: (id: string) => void;
+  isEditing: boolean;
+  onStartEditing: (id: string) => void;
+  onStopEditing: (id: string) => void;
+  onTextChange: (id: string, text: string) => void;
 }
 
 export interface NoteColorPickerProps {
@@ -34,12 +39,14 @@ export interface NoteColorPickerProps {
 
 export interface BoardProps {
   notes: readonly Note[];
-  onCreateNote: (rect: Geometry.Rect) => void;
+  /** Returns the new note's id. */
+  onCreateNote: (rect: Geometry.Rect) => string;
   onMoveNote: (id: string, position: Geometry.Point2d) => void;
   onResizeNote: (id: string, size: Geometry.Size) => void;
   onSetNoteColor: (id: string, color: NoteColor) => void;
   onDeleteNote: (id: string) => void;
   onBringNoteToFront: (id: string) => void;
+  onSetNoteText: (id: string, text: string) => void;
 }
 
 export interface TrashZoneProps {
@@ -109,8 +116,14 @@ interface BringNoteToFront {
   id: string;
 }
 
+interface SetNoteText {
+  type: 'setNoteText';
+  id: string;
+  text: string;
+}
+
 export type NotesAction =
-  CreateNote | MoveNote | ResizeNote | DeleteNote | SetNoteColor | BringNoteToFront;
+  CreateNote | MoveNote | ResizeNote | DeleteNote | SetNoteColor | BringNoteToFront | SetNoteText;
 
 // 5. State
 
@@ -121,10 +134,12 @@ export interface NotesState {
 /** What `useNotesReducer` exposes: the notes and stable commands that change them. */
 export interface NotesStore {
   notes: readonly Note[];
-  createNote: (rect: Geometry.Rect) => void;
+  /** Returns the new note's id. */
+  createNote: (rect: Geometry.Rect) => string;
   moveNote: (id: string, position: Geometry.Point2d) => void;
   resizeNote: (id: string, size: Geometry.Size) => void;
   deleteNote: (id: string) => void;
   setNoteColor: (id: string, color: NoteColor) => void;
   bringNoteToFront: (id: string) => void;
+  setNoteText: (id: string, text: string) => void;
 }

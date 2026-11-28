@@ -13,8 +13,12 @@ import type * as Notes from '../../types/notes.types';
 export const useNotesReducer = (): Notes.NotesStore => {
   const [state, dispatch] = useReducer(notesReducer, INITIAL_NOTES_STATE);
 
+  // The id is made here, outside the reducer, so the reducer stays pure and
+  // the caller learns which note it just created.
   const createNote = useCallback((rect: Geometry.Rect) => {
-    dispatch({ type: 'createNote', id: crypto.randomUUID(), rect });
+    const id = crypto.randomUUID();
+    dispatch({ type: 'createNote', id, rect });
+    return id;
   }, []);
 
   const moveNote = useCallback((id: string, position: Geometry.Point2d) => {
@@ -37,6 +41,10 @@ export const useNotesReducer = (): Notes.NotesStore => {
     dispatch({ type: 'bringNoteToFront', id });
   }, []);
 
+  const setNoteText = useCallback((id: string, text: string) => {
+    dispatch({ type: 'setNoteText', id, text });
+  }, []);
+
   return {
     notes: state.notes,
     createNote,
@@ -45,5 +53,6 @@ export const useNotesReducer = (): Notes.NotesStore => {
     deleteNote,
     setNoteColor,
     bringNoteToFront,
+    setNoteText,
   };
 };

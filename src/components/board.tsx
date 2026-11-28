@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import * as GeometryUtils from '../helpers/geometry.helpers';
 import { useDragGesture } from '../hooks/gestures/drag-gesture.hook';
@@ -15,7 +15,9 @@ import { TrashZone } from './trash-zone';
  * trash zone in its bottom-right corner. The live preview is written straight
  * to the DOM through a ref, so a drag costs no React renders; the board state
  * changes once, on release. Notes are painted by their `z`, always beneath the
- * preview and the trash; their rendered order never changes.
+ * preview and the trash; their rendered order never changes. The board also
+ * knows which note, if any, is being edited, so only one note is in edit mode
+ * at a time.
  */
 export const Board = ({
   notes,
@@ -25,7 +27,9 @@ export const Board = ({
   onDeleteNote,
   onSetNoteColor,
   onBringNoteToFront,
+  onSetNoteText,
 }: Notes.BoardProps) => {
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const trashRef = useRef<HTMLDivElement>(null);
@@ -77,7 +81,9 @@ export const Board = ({
     (clientPoint: Geometry.Point2d) => {
       setPreviewRect(null);
       const rect = getDraftRect(clientPoint);
-      if (rect) onCreateNote(rect);
+      // A note just drawn opens ready to type: the card's edit-mode effect
+      // focuses its text on mount.
+      if (rect) setEditingNoteId(onCreateNote(rect));
     },
     [getDraftRect, onCreateNote, setPreviewRect]
   );
@@ -85,6 +91,16 @@ export const Board = ({
   const handleDragCancel = useCallback(() => {
     setPreviewRect(null);
   }, [setPreviewRect]);
+
+  const handleStartEditing = useCallback((id: string) => {
+    setEditingNoteId(id);
+  }, []);
+
+  // Clears only the note that asked: a late blur from the note just left must
+  // not end editing on the note that has taken over.
+  const handleStopEditing = useCallback((id: string) => {
+    setEditingNoteId((current) => (current === id ? null : current));
+  }, []);
 
   const dragHandlers = useDragGesture({
     onStart: handleDragStart,
@@ -106,6 +122,10 @@ export const Board = ({
             trashRef={trashRef}
             onColorChange={onSetNoteColor}
             onBringToFront={onBringNoteToFront}
+            isEditing={note.id === editingNoteId}
+            onStartEditing={handleStartEditing}
+            onStopEditing={handleStopEditing}
+            onTextChange={onSetNoteText}
           />
         ))}
       </div>

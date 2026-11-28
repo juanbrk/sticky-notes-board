@@ -4,8 +4,16 @@ import { Board } from './board';
 
 /** Root of the app: owns the notes store and hands it to the board. */
 export const App = () => {
-  const { notes, createNote, moveNote, resizeNote, deleteNote, setNoteColor, bringNoteToFront } =
-    useNotesReducer();
+  const {
+    notes,
+    createNote,
+    moveNote,
+    resizeNote,
+    deleteNote,
+    setNoteColor,
+    bringNoteToFront,
+    setNoteText,
+  } = useNotesReducer();
 
   return (
     <main className="app">
@@ -18,6 +26,7 @@ export const App = () => {
         onDeleteNote={deleteNote}
         onSetNoteColor={setNoteColor}
         onBringNoteToFront={bringNoteToFront}
+        onSetNoteText={setNoteText}
       />
     </main>
   );

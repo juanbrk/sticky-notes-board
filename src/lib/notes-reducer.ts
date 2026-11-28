@@ -29,6 +29,7 @@ export const notesReducer = (
             ...action.rect,
             z: getTopZ(state.notes) + 1,
             color: DEFAULT_NOTE_COLOR,
+            text: '',
           },
         ],
       };
@@ -58,6 +59,15 @@ export const notesReducer = (
     }
     case 'bringNoteToFront':
       return bringNoteToFront(state, action.id);
+    case 'setNoteText': {
+      const note = state.notes.find((candidate) => candidate.id === action.id);
+      if (!note || note.text === action.text) return state;
+      const nextNote = { ...note, text: action.text };
+      return {
+        ...state,
+        notes: state.notes.map((candidate) => (candidate === note ? nextNote : candidate)),
+      };
+    }
   }
 };
 
