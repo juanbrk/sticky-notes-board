@@ -92,7 +92,9 @@ export const useDragGesture = ({
         if (!isPrimaryPress || isGestureActive) return;
         event.currentTarget.setPointerCapture(event.pointerId);
         activePointerIdRef.current = event.pointerId;
-        const { signal } = (windowListenersAbortRef.current = new AbortController());
+        const windowListenersAbort = new AbortController();
+        windowListenersAbortRef.current = windowListenersAbort;
+        const { signal } = windowListenersAbort;
         window.addEventListener('blur', cancelGesture, { signal });
         window.addEventListener('keydown', handleWindowKeyDown, { signal });
         lastPointRef.current = getClientPoint(event);
