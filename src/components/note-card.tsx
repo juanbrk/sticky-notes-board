@@ -20,6 +20,7 @@ const NoteCardView = ({
   onDelete,
   trashRef,
   onColorChange,
+  onBringToFront,
 }: Notes.NoteCardProps) => {
   const elementRef = useRef<HTMLDivElement>(null);
 
@@ -44,8 +45,18 @@ const NoteCardView = ({
     <div
       ref={elementRef}
       className="note-card"
-      style={{ left: note.x, top: note.y, width: note.width, height: note.height }}
+      style={{
+        left: note.x,
+        top: note.y,
+        width: note.width,
+        height: note.height,
+        zIndex: note.z,
+      }}
       data-note-color={note.color}
+      // Capture phase: runs before the move, resize and swatch handlers stop the press.
+      onPointerDownCapture={() => {
+        onBringToFront(note.id);
+      }}
       {...moveHandlers}
     >
       <NoteColorPicker noteId={note.id} color={note.color} onColorChange={onColorChange} />
@@ -58,7 +69,8 @@ const NoteCardView = ({
  * A sticky note placed at its position and size on the board; drag it to move
  * it, drop it on the trash to delete it, drag its bottom-right corner to
  * resize it, or pick a swatch to recolor it. Only the move can delete, so a
- * resize never does. Memoised: the reducer keeps untouched notes as the same
+ * resize never does. Any press on it brings it to the front first, so the drag
+ * it starts happens on top. Memoised: the reducer keeps untouched notes as the same
  * objects and the callbacks are stable, so a change to one note renders only
  * that card.
  */
