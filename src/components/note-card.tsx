@@ -46,6 +46,7 @@ const NoteCardView = ({
   onDelete,
   trashRef,
   onColorChange,
+  onBringToFront,
   isEditing,
   onStartEditing,
   onStopEditing,
@@ -114,10 +115,20 @@ const NoteCardView = ({
     <div
       ref={elementRef}
       className="note-card"
-      style={{ left: note.x, top: note.y, width: note.width, height: note.height }}
+      style={{
+        left: note.x,
+        top: note.y,
+        width: note.width,
+        height: note.height,
+        zIndex: note.z,
+      }}
       data-note-color={note.color}
       data-editing={isEditing || undefined}
       onDoubleClick={handleDoubleClick}
+      // Capture phase: runs before the move, resize, swatch and text handlers stop the press.
+      onPointerDownCapture={() => {
+        onBringToFront(note.id);
+      }}
       {...moveHandlers}
     >
       <textarea
@@ -143,7 +154,8 @@ const NoteCardView = ({
  * A sticky note placed at its position and size on the board; drag it to move
  * it, drop it on the trash to delete it, drag its bottom-right corner to
  * resize it, or pick a swatch to recolor it. Only the move can delete, so a
- * resize never does.
+ * resize never does. Any press on it brings it to the front first, so the drag
+ * it starts happens on top.
  *
  * Its text is a `<textarea>` that is always mounted. In read mode it is
  * read-only and lets the pointer through, so a press on the note still moves

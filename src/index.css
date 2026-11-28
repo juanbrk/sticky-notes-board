@@ -3,7 +3,9 @@
   --radius-note: 2px;
   --radius-trash: 6px;
 
-  /* The trash is drawn above every note, so a note can never hide it. */
+  /* The trash is drawn above every note, so a note can never hide it. It holds
+     however high a note's z grows because the notes share one stacking context
+     (.board__notes in board.css). */
   --z-trash: 1;
 
   --color-text: #2b2a27;

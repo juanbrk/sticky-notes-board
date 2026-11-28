@@ -9,14 +9,25 @@ const createNote = (id: string, x = 0, y = 0): Notes.NotesAction => ({
   rect: { x, y, width: 120, height: 80 },
 });
 
+const bringNoteToFront = (id: string): Notes.NotesAction => ({ type: 'bringNoteToFront', id });
+
 describe('notesReducer', () => {
   describe('createNote', () => {
     it('adds a note with the given id, position and size', () => {
       const nextState = notesReducer(INITIAL_NOTES_STATE, createNote('a', 10, 20));
 
       expect(nextState.notes).toEqual([
-        { id: 'a', x: 10, y: 20, width: 120, height: 80, color: 'yellow', text: '' },
+        { id: 'a', x: 10, y: 20, width: 120, height: 80, z: 1, color: 'yellow', text: '' },
       ]);
+    });
+
+    it('puts the new note on top of the existing ones', () => {
+      const withOne = notesReducer(INITIAL_NOTES_STATE, createNote('a'));
+      const raisedA = notesReducer(notesReducer(withOne, createNote('b')), bringNoteToFront('a'));
+
+      const withThree = notesReducer(raisedA, createNote('c'));
+
+      expect(withThree.notes.map((note) => note.z)).toEqual([3, 2, 4]);
     });
 
     it('appends after the existing notes, keeping their order', () => {
@@ -73,6 +84,7 @@ describe('notesReducer', () => {
         y: 60,
         width: 120,
         height: 80,
+        z: 1,
         color: 'yellow',
         text: '',
       });
@@ -130,6 +142,7 @@ describe('notesReducer', () => {
         y: 200,
         width: 200,
         height: 150,
+        z: 2,
         color: 'yellow',
         text: '',
       });
@@ -269,6 +282,63 @@ describe('notesReducer', () => {
       const withOne = notesReducer(INITIAL_NOTES_STATE, createNote('a'));
 
       expect(notesReducer(withOne, { type: 'deleteNote', id: 'a' }).notes).toEqual([]);
+    });
+  });
+
+  describe('bringNoteToFront', () => {
+    const threeNotes = (): Notes.NotesState =>
+      [createNote('a'), createNote('b'), createNote('c')].reduce(notesReducer, INITIAL_NOTES_STATE);
+
+    it('raises only the target above every other note', () => {
+      const state = threeNotes();
+
+      const nextState = notesReducer(state, bringNoteToFront('a'));
+
+      expect(nextState.notes[0]).toEqual({ ...state.notes[0], z: 4 });
+      expect(nextState.notes[1]).toBe(state.notes[1]);
+      expect(nextState.notes[2]).toBe(state.notes[2]);
+    });
+
+    it('keeps the array order, so the pressed note is never moved in the DOM', () => {
+      const nextState = notesReducer(threeNotes(), bringNoteToFront('a'));
+
+      expect(nextState.notes.map((note) => note.id)).toEqual(['a', 'b', 'c']);
+    });
+
+    it('keeps the other notes in the same order among themselves', () => {
+      const nextState = notesReducer(threeNotes(), bringNoteToFront('b'));
+
+      expect(nextState.notes.map((note) => note.z)).toEqual([1, 4, 3]);
+    });
+
+    it('returns the same state for the note already on top', () => {
+      const state = threeNotes();
+
+      expect(notesReducer(state, bringNoteToFront('c'))).toBe(state);
+    });
+
+    it('returns the same state for an unknown id', () => {
+      const state = threeNotes();
+
+      expect(notesReducer(state, bringNoteToFront('zz'))).toBe(state);
+    });
+
+    it('still raises above every note after the top one was deleted', () => {
+      const withoutTop = notesReducer(threeNotes(), { type: 'deleteNote', id: 'c' });
+
+      const nextState = notesReducer(withoutTop, bringNoteToFront('a'));
+
+      expect(nextState.notes.map((note) => note.z)).toEqual([3, 2]);
+    });
+
+    it('does not mutate the previous state', () => {
+      const state = threeNotes();
+      const raisedNote = state.notes[0];
+
+      notesReducer(state, bringNoteToFront('a'));
+
+      expect(state.notes[0]).toBe(raisedNote);
+      expect(raisedNote).toMatchObject({ z: 1 });
     });
   });
 });

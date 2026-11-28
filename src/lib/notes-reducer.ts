@@ -24,7 +24,13 @@ export const notesReducer = (
         ...state,
         notes: [
           ...state.notes,
-          { id: action.id, ...action.rect, color: DEFAULT_NOTE_COLOR, text: '' },
+          {
+            id: action.id,
+            ...action.rect,
+            z: getTopZ(state.notes) + 1,
+            color: DEFAULT_NOTE_COLOR,
+            text: '',
+          },
         ],
       };
     case 'moveNote':
@@ -51,6 +57,8 @@ export const notesReducer = (
         notes: state.notes.map((candidate) => (candidate === note ? nextNote : candidate)),
       };
     }
+    case 'bringNoteToFront':
+      return bringNoteToFront(state, action.id);
     case 'setNoteText': {
       const note = state.notes.find((candidate) => candidate.id === action.id);
       if (!note || note.text === action.text) return state;
@@ -62,6 +70,28 @@ export const notesReducer = (
     }
   }
 };
+
+/**
+ * Raises one note above every other by giving it the highest `z` plus one.
+ * The array order never changes: reordering it would make React move the
+ * pressed note's DOM node, which drops its pointer capture and cancels the
+ * drag that the same press starts. A note already on top, or an unknown id,
+ * returns `state` itself, so pressing the top note renders nothing.
+ */
+const bringNoteToFront = (state: Notes.NotesState, id: string): Notes.NotesState => {
+  const note = state.notes.find((candidate) => candidate.id === id);
+  const topZ = getTopZ(state.notes);
+  if (!note || note.z === topZ) return state;
+  const nextNote = { ...note, z: topZ + 1 };
+  return {
+    ...state,
+    notes: state.notes.map((candidate) => (candidate === note ? nextNote : candidate)),
+  };
+};
+
+/** The highest `z` on the board, or 0 when it is empty. */
+const getTopZ = (notes: readonly Notes.Note[]): number =>
+  notes.reduce((topZ, note) => Math.max(topZ, note.z), 0);
 
 /** Removes one note. An unknown id returns `state` itself, so nothing re-renders. */
 const deleteNote = (state: Notes.NotesState, id: string): Notes.NotesState => {

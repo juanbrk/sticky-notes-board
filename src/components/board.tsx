@@ -14,8 +14,10 @@ import { TrashZone } from './trash-zone';
  * Fixed-size board where dragging on empty space creates a note, with the
  * trash zone in its bottom-right corner. The live preview is written straight
  * to the DOM through a ref, so a drag costs no React renders; the board state
- * changes once, on release. The board also knows which note, if any, is
- * being edited, so only one note is in edit mode at a time.
+ * changes once, on release. Notes are painted by their `z`, always beneath the
+ * preview and the trash; their rendered order never changes. The board also
+ * knows which note, if any, is being edited, so only one note is in edit mode
+ * at a time.
  */
 export const Board = ({
   notes,
@@ -24,6 +26,7 @@ export const Board = ({
   onResizeNote,
   onDeleteNote,
   onSetNoteColor,
+  onBringNoteToFront,
   onSetNoteText,
 }: Notes.BoardProps) => {
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
@@ -108,21 +111,24 @@ export const Board = ({
 
   return (
     <div ref={boardRef} className="board" style={BOARD_SIZE} {...dragHandlers}>
-      {notes.map((note) => (
-        <NoteCard
-          key={note.id}
-          note={note}
-          onMove={onMoveNote}
-          onResize={onResizeNote}
-          onDelete={onDeleteNote}
-          trashRef={trashRef}
-          onColorChange={onSetNoteColor}
-          isEditing={note.id === editingNoteId}
-          onStartEditing={handleStartEditing}
-          onStopEditing={handleStopEditing}
-          onTextChange={onSetNoteText}
-        />
-      ))}
+      <div className="board__notes">
+        {notes.map((note) => (
+          <NoteCard
+            key={note.id}
+            note={note}
+            onMove={onMoveNote}
+            onResize={onResizeNote}
+            onDelete={onDeleteNote}
+            trashRef={trashRef}
+            onColorChange={onSetNoteColor}
+            onBringToFront={onBringNoteToFront}
+            isEditing={note.id === editingNoteId}
+            onStartEditing={handleStartEditing}
+            onStopEditing={handleStopEditing}
+            onTextChange={onSetNoteText}
+          />
+        ))}
+      </div>
       <div ref={previewRef} className="board__preview" aria-hidden hidden />
       <TrashZone ref={trashRef} />
     </div>

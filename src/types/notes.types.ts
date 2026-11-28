@@ -9,6 +9,8 @@ export type NoteColor = (typeof NOTE_COLORS)[number];
 
 export interface Note extends Geometry.Rect {
   id: string;
+  /** Paint order among the notes; the highest is on top. Unique, but not contiguous. */
+  z: number;
   color: NoteColor;
   text: string;
 }
@@ -22,6 +24,7 @@ export interface NoteCardProps {
   onDelete: (id: string) => void;
   trashRef: RefObject<HTMLElement | null>;
   onColorChange: (id: string, color: NoteColor) => void;
+  onBringToFront: (id: string) => void;
   isEditing: boolean;
   onStartEditing: (id: string) => void;
   onStopEditing: (id: string) => void;
@@ -42,6 +45,7 @@ export interface BoardProps {
   onResizeNote: (id: string, size: Geometry.Size) => void;
   onSetNoteColor: (id: string, color: NoteColor) => void;
   onDeleteNote: (id: string) => void;
+  onBringNoteToFront: (id: string) => void;
   onSetNoteText: (id: string, text: string) => void;
 }
 
@@ -107,6 +111,11 @@ interface SetNoteColor {
   color: NoteColor;
 }
 
+interface BringNoteToFront {
+  type: 'bringNoteToFront';
+  id: string;
+}
+
 interface SetNoteText {
   type: 'setNoteText';
   id: string;
@@ -114,7 +123,7 @@ interface SetNoteText {
 }
 
 export type NotesAction =
-  CreateNote | MoveNote | ResizeNote | DeleteNote | SetNoteColor | SetNoteText;
+  CreateNote | MoveNote | ResizeNote | DeleteNote | SetNoteColor | BringNoteToFront | SetNoteText;
 
 // 5. State
 
@@ -131,5 +140,6 @@ export interface NotesStore {
   resizeNote: (id: string, size: Geometry.Size) => void;
   deleteNote: (id: string) => void;
   setNoteColor: (id: string, color: NoteColor) => void;
+  bringNoteToFront: (id: string) => void;
   setNoteText: (id: string, text: string) => void;
 }
