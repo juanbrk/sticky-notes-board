@@ -36,7 +36,8 @@ export interface NoteColorPickerProps {
 
 export interface BoardProps {
   notes: readonly Note[];
-  onCreateNote: (rect: Geometry.Rect) => void;
+  /** Returns the new note's id. */
+  onCreateNote: (rect: Geometry.Rect) => string;
   onMoveNote: (id: string, position: Geometry.Point2d) => void;
   onResizeNote: (id: string, size: Geometry.Size) => void;
   onSetNoteColor: (id: string, color: NoteColor) => void;
@@ -124,7 +125,8 @@ export interface NotesState {
 /** What `useNotesReducer` exposes: the notes and stable commands that change them. */
 export interface NotesStore {
   notes: readonly Note[];
-  createNote: (rect: Geometry.Rect) => void;
+  /** Returns the new note's id. */
+  createNote: (rect: Geometry.Rect) => string;
   moveNote: (id: string, position: Geometry.Point2d) => void;
   resizeNote: (id: string, size: Geometry.Size) => void;
   deleteNote: (id: string) => void;

@@ -78,7 +78,9 @@ export const Board = ({
     (clientPoint: Geometry.Point2d) => {
       setPreviewRect(null);
       const rect = getDraftRect(clientPoint);
-      if (rect) onCreateNote(rect);
+      // A note just drawn opens ready to type: the card's edit-mode effect
+      // focuses its text on mount.
+      if (rect) setEditingNoteId(onCreateNote(rect));
     },
     [getDraftRect, onCreateNote, setPreviewRect]
   );
