@@ -22,7 +22,10 @@ export const notesReducer = (
     case 'createNote':
       return {
         ...state,
-        notes: [...state.notes, { id: action.id, ...action.rect, color: DEFAULT_NOTE_COLOR }],
+        notes: [
+          ...state.notes,
+          { id: action.id, ...action.rect, color: DEFAULT_NOTE_COLOR, text: '' },
+        ],
       };
     case 'moveNote':
       return updateNoteRect(state, action.id, (note) => ({
@@ -43,6 +46,15 @@ export const notesReducer = (
       // Same color: `state` itself, so a click on the current swatch renders nothing.
       if (!note || note.color === action.color) return state;
       const nextNote = { ...note, color: action.color };
+      return {
+        ...state,
+        notes: state.notes.map((candidate) => (candidate === note ? nextNote : candidate)),
+      };
+    }
+    case 'setNoteText': {
+      const note = state.notes.find((candidate) => candidate.id === action.id);
+      if (!note || note.text === action.text) return state;
+      const nextNote = { ...note, text: action.text };
       return {
         ...state,
         notes: state.notes.map((candidate) => (candidate === note ? nextNote : candidate)),

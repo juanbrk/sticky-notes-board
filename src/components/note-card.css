@@ -24,6 +24,44 @@
   opacity: 0.5;
 }
 
+/* Fills the note. In read mode the pointer goes through it to the note, so a
+   press still moves the note; long text is cut off at the bottom edge. The
+   padding keeps text clear of the swatch row (top) and the grip (bottom). */
+.note-card__text {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 24px 8px 12px;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  background: transparent;
+  border: 0;
+  border-radius: inherit;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Firefox dims placeholders by default; the token already carries the contrast. */
+.note-card__text::placeholder {
+  color: var(--color-note-hint);
+  opacity: 1;
+}
+
+.note-card[data-editing] .note-card__text {
+  overflow: auto;
+  cursor: text;
+  pointer-events: auto;
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
 .note-card__resize-handle {
   position: absolute;
   right: 0;

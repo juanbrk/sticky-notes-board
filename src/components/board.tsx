@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import * as GeometryUtils from '../helpers/geometry.helpers';
 import { useDragGesture } from '../hooks/gestures/drag-gesture.hook';
@@ -14,7 +14,8 @@ import { TrashZone } from './trash-zone';
  * Fixed-size board where dragging on empty space creates a note, with the
  * trash zone in its bottom-right corner. The live preview is written straight
  * to the DOM through a ref, so a drag costs no React renders; the board state
- * changes once, on release.
+ * changes once, on release. The board also knows which note, if any, is
+ * being edited, so only one note is in edit mode at a time.
  */
 export const Board = ({
   notes,
@@ -23,7 +24,9 @@ export const Board = ({
   onResizeNote,
   onDeleteNote,
   onSetNoteColor,
+  onSetNoteText,
 }: Notes.BoardProps) => {
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const trashRef = useRef<HTMLDivElement>(null);
@@ -84,6 +87,16 @@ export const Board = ({
     setPreviewRect(null);
   }, [setPreviewRect]);
 
+  const handleStartEditing = useCallback((id: string) => {
+    setEditingNoteId(id);
+  }, []);
+
+  // Clears only the note that asked: a late blur from the note just left must
+  // not end editing on the note that has taken over.
+  const handleStopEditing = useCallback((id: string) => {
+    setEditingNoteId((current) => (current === id ? null : current));
+  }, []);
+
   const dragHandlers = useDragGesture({
     onStart: handleDragStart,
     onMove: handleDragMove,
@@ -102,6 +115,10 @@ export const Board = ({
           onDelete={onDeleteNote}
           trashRef={trashRef}
           onColorChange={onSetNoteColor}
+          isEditing={note.id === editingNoteId}
+          onStartEditing={handleStartEditing}
+          onStopEditing={handleStopEditing}
+          onTextChange={onSetNoteText}
         />
       ))}
       <div ref={previewRef} className="board__preview" aria-hidden hidden />

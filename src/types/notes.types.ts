@@ -10,6 +10,7 @@ export type NoteColor = (typeof NOTE_COLORS)[number];
 export interface Note extends Geometry.Rect {
   id: string;
   color: NoteColor;
+  text: string;
 }
 
 // 3. Props and hook options
@@ -21,6 +22,10 @@ export interface NoteCardProps {
   onDelete: (id: string) => void;
   trashRef: RefObject<HTMLElement | null>;
   onColorChange: (id: string, color: NoteColor) => void;
+  isEditing: boolean;
+  onStartEditing: (id: string) => void;
+  onStopEditing: (id: string) => void;
+  onTextChange: (id: string, text: string) => void;
 }
 
 export interface NoteColorPickerProps {
@@ -36,6 +41,7 @@ export interface BoardProps {
   onResizeNote: (id: string, size: Geometry.Size) => void;
   onSetNoteColor: (id: string, color: NoteColor) => void;
   onDeleteNote: (id: string) => void;
+  onSetNoteText: (id: string, text: string) => void;
 }
 
 export interface TrashZoneProps {
@@ -100,7 +106,14 @@ interface SetNoteColor {
   color: NoteColor;
 }
 
-export type NotesAction = CreateNote | MoveNote | ResizeNote | DeleteNote | SetNoteColor;
+interface SetNoteText {
+  type: 'setNoteText';
+  id: string;
+  text: string;
+}
+
+export type NotesAction =
+  CreateNote | MoveNote | ResizeNote | DeleteNote | SetNoteColor | SetNoteText;
 
 // 5. State
 
@@ -116,4 +129,5 @@ export interface NotesStore {
   resizeNote: (id: string, size: Geometry.Size) => void;
   deleteNote: (id: string) => void;
   setNoteColor: (id: string, color: NoteColor) => void;
+  setNoteText: (id: string, text: string) => void;
 }

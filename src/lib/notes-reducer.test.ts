@@ -15,7 +15,7 @@ describe('notesReducer', () => {
       const nextState = notesReducer(INITIAL_NOTES_STATE, createNote('a', 10, 20));
 
       expect(nextState.notes).toEqual([
-        { id: 'a', x: 10, y: 20, width: 120, height: 80, color: 'yellow' },
+        { id: 'a', x: 10, y: 20, width: 120, height: 80, color: 'yellow', text: '' },
       ]);
     });
 
@@ -74,6 +74,7 @@ describe('notesReducer', () => {
         width: 120,
         height: 80,
         color: 'yellow',
+        text: '',
       });
       expect(nextState.notes[1]).toBe(state.notes[1]);
     });
@@ -130,6 +131,7 @@ describe('notesReducer', () => {
         width: 200,
         height: 150,
         color: 'yellow',
+        text: '',
       });
       expect(nextState.notes[0]).toBe(state.notes[0]);
     });
@@ -189,6 +191,51 @@ describe('notesReducer', () => {
       const state = twoNotes();
 
       expect(notesReducer(state, { type: 'setNoteColor', id: 'b', color: 'yellow' })).toBe(state);
+    });
+  });
+
+  describe('setNoteText', () => {
+    it('changes only the target note and keeps its rect and color', () => {
+      const state = twoNotes();
+
+      const nextState = notesReducer(state, {
+        type: 'setNoteText',
+        id: 'b',
+        text: 'Buy milk\nEggs',
+      });
+
+      expect(nextState.notes[1]).toEqual({ ...state.notes[1], text: 'Buy milk\nEggs' });
+      expect(nextState.notes[0]).toBe(state.notes[0]);
+    });
+
+    it('does not mutate the previous state', () => {
+      const state = twoNotes();
+      const editedNote = state.notes[1];
+
+      notesReducer(state, { type: 'setNoteText', id: 'b', text: 'Buy milk' });
+
+      expect(state.notes[1]).toBe(editedNote);
+      expect(editedNote).toMatchObject({ text: '' });
+    });
+
+    it('returns the same state for an unknown id', () => {
+      const state = twoNotes();
+
+      expect(notesReducer(state, { type: 'setNoteText', id: 'zz', text: 'Buy milk' })).toBe(state);
+    });
+
+    it('returns the same state when the text did not change', () => {
+      const state = twoNotes();
+
+      expect(notesReducer(state, { type: 'setNoteText', id: 'b', text: '' })).toBe(state);
+    });
+
+    it('keeps the text when the note is later moved', () => {
+      const withText = notesReducer(twoNotes(), { type: 'setNoteText', id: 'a', text: 'Hi' });
+
+      const moved = notesReducer(withText, { type: 'moveNote', id: 'a', position: { x: 5, y: 5 } });
+
+      expect(moved.notes[0]).toMatchObject({ text: 'Hi' });
     });
   });
 
