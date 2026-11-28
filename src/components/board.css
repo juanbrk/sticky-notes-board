@@ -30,3 +30,57 @@
   border-radius: var(--radius-note);
   pointer-events: none;
 }
+
+/* Covers the board while the saved notes load, so it takes every press and
+   shows the not-allowed cursor; the board itself has no drag handlers then. */
+.board__loading {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-board-loading);
+  display: grid;
+  place-items: center;
+  cursor: not-allowed;
+}
+
+/* Fades in only after the delay: localStorage loads in under a frame, and a
+   spinner shown at once would flash on every reload. */
+.board__spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-spinner-track);
+  border-top-color: var(--color-spinner);
+  border-radius: 50%;
+  opacity: 0;
+  animation:
+    board-spinner-appear 150ms ease-out var(--delay-board-loading) forwards,
+    board-spinner-spin 800ms linear infinite;
+}
+
+/* Slower, not stopped: a still ring would no longer read as "busy". */
+@media (prefers-reduced-motion: reduce) {
+  .board__spinner {
+    animation-duration: 150ms, 2400ms;
+  }
+}
+
+@keyframes board-spinner-appear {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes board-spinner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Read by screen readers only; the spinner carries the message visually. */
+.board__loading-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
