@@ -73,7 +73,8 @@ export const readNotesPayload = (json: string | null): Storage.NotesPayloadReadR
   const seenIds = new Set<string>();
   for (const candidate of candidates) {
     const note = toNote(candidate);
-    if (note && !seenIds.has(note.id)) {
+    const isNewValidNote = note !== null && !seenIds.has(note.id);
+    if (isNewValidNote) {
       seenIds.add(note.id);
       notes.push(note);
     }

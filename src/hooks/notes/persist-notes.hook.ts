@@ -26,6 +26,8 @@ export const usePersistNotes = ({
 }: Storage.PersistNotesOptions): Storage.NotesPersistence => {
   const [status, setStatus] = useState<Storage.NotesLoadStatus>('loading');
   const loadRef = useRef<Promise<readonly Notes.Note[]> | null>(null);
+  // A later effect run must not replay the old snapshot over newer edits.
+  const hasHandledLoadRef = useRef(false);
   // The notes the storage already holds: the loaded ones, then the last saved.
   const lastSyncedNotesRef = useRef<readonly Notes.Note[] | null>(null);
   const saveQueueRef = useRef<Promise<void> | null>(null);
@@ -35,13 +37,15 @@ export const usePersistNotes = ({
     loadRef.current ??= repository.load();
     loadRef.current
       .then((loadedNotes) => {
-        if (isCancelled) return;
+        if (isCancelled || hasHandledLoadRef.current) return;
+        hasHandledLoadRef.current = true;
         lastSyncedNotesRef.current = loadedNotes;
         onLoad(loadedNotes);
         setStatus('loaded');
       })
       .catch((error: unknown) => {
-        if (isCancelled) return;
+        if (isCancelled || hasHandledLoadRef.current) return;
+        hasHandledLoadRef.current = true;
         console.warn('Could not read the saved notes; changes will not be saved.', error);
         setStatus('failed');
       });
@@ -51,7 +55,8 @@ export const usePersistNotes = ({
   }, [repository, onLoad]);
 
   useEffect(() => {
-    if (status !== 'loaded' || notes === lastSyncedNotesRef.current) return;
+    const isSaveNeeded = status === 'loaded' && notes !== lastSyncedNotesRef.current;
+    if (!isSaveNeeded) return;
     lastSyncedNotesRef.current = notes;
     saveQueueRef.current = (saveQueueRef.current ?? Promise.resolve())
       .then(() => repository.save(notes))
