@@ -15,6 +15,14 @@
   touch-action: none;
 }
 
+/* Its own stacking context: each note's z-index, however high, is only compared
+   with the other notes, so the preview and the trash after it stay on top. Left
+   unpositioned on purpose: with only absolute children it is 0px tall, so it
+   never takes a press meant for the board, and notes still place against .board. */
+.board__notes {
+  isolation: isolate;
+}
+
 .board__preview {
   position: absolute;
   background: var(--color-note-preview);
