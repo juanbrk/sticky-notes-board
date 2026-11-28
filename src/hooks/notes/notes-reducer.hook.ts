@@ -45,6 +45,10 @@ export const useNotesReducer = (): Notes.NotesStore => {
     dispatch({ type: 'setNoteText', id, text });
   }, []);
 
+  const loadNotes = useCallback((notes: readonly Notes.Note[]) => {
+    dispatch({ type: 'loadNotes', notes });
+  }, []);
+
   return {
     notes: state.notes,
     createNote,
@@ -54,5 +58,6 @@ export const useNotesReducer = (): Notes.NotesStore => {
     setNoteColor,
     bringNoteToFront,
     setNoteText,
+    loadNotes,
   };
 };

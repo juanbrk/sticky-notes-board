@@ -68,6 +68,8 @@ export const notesReducer = (
         notes: state.notes.map((candidate) => (candidate === note ? nextNote : candidate)),
       };
     }
+    case 'loadNotes':
+      return { ...state, notes: action.notes };
   }
 };
 

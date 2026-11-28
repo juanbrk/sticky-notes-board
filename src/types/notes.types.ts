@@ -39,6 +39,8 @@ export interface NoteColorPickerProps {
 
 export interface BoardProps {
   notes: readonly Note[];
+  /** While the saved notes load, the board is disabled and shows a spinner. */
+  isLoading: boolean;
   /** Returns the new note's id. */
   onCreateNote: (rect: Geometry.Rect) => string;
   onMoveNote: (id: string, position: Geometry.Point2d) => void;
@@ -122,8 +124,21 @@ interface SetNoteText {
   text: string;
 }
 
+/** Replaces every note with the board read from storage. */
+interface LoadNotes {
+  type: 'loadNotes';
+  notes: readonly Note[];
+}
+
 export type NotesAction =
-  CreateNote | MoveNote | ResizeNote | DeleteNote | SetNoteColor | BringNoteToFront | SetNoteText;
+  | CreateNote
+  | MoveNote
+  | ResizeNote
+  | DeleteNote
+  | SetNoteColor
+  | BringNoteToFront
+  | SetNoteText
+  | LoadNotes;
 
 // 5. State
 
@@ -142,4 +157,5 @@ export interface NotesStore {
   setNoteColor: (id: string, color: NoteColor) => void;
   bringNoteToFront: (id: string) => void;
   setNoteText: (id: string, text: string) => void;
+  loadNotes: (notes: readonly Note[]) => void;
 }

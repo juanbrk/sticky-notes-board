@@ -341,4 +341,47 @@ describe('notesReducer', () => {
       expect(raisedNote).toMatchObject({ z: 1 });
     });
   });
+
+  describe('loadNotes', () => {
+    const savedNotes: readonly Notes.Note[] = [
+      { id: 's1', x: 5, y: 5, width: 100, height: 60, z: 7, color: 'blue', text: 'Saved' },
+      { id: 's2', x: 50, y: 50, width: 80, height: 80, z: 3, color: 'green', text: '' },
+    ];
+
+    it('replaces every note with the loaded ones', () => {
+      const nextState = notesReducer(twoNotes(), { type: 'loadNotes', notes: savedNotes });
+
+      expect(nextState.notes).toEqual(savedNotes);
+    });
+
+    it('leaves an empty board when loading no notes', () => {
+      expect(notesReducer(twoNotes(), { type: 'loadNotes', notes: [] }).notes).toEqual([]);
+    });
+
+    it('does not mutate the previous state', () => {
+      const state = twoNotes();
+      const previousNotes = state.notes;
+
+      notesReducer(state, { type: 'loadNotes', notes: savedNotes });
+
+      expect(state.notes).toBe(previousNotes);
+      expect(state.notes.map((note) => note.id)).toEqual(['a', 'b']);
+    });
+
+    it('stacks a note created after loading above every loaded note', () => {
+      const loaded = notesReducer(INITIAL_NOTES_STATE, { type: 'loadNotes', notes: savedNotes });
+
+      const nextState = notesReducer(loaded, createNote('c'));
+
+      expect(nextState.notes[2]).toMatchObject({ id: 'c', z: 8 });
+    });
+
+    it('raises a loaded note above the highest loaded z', () => {
+      const loaded = notesReducer(INITIAL_NOTES_STATE, { type: 'loadNotes', notes: savedNotes });
+
+      const nextState = notesReducer(loaded, bringNoteToFront('s2'));
+
+      expect(nextState.notes[1]).toMatchObject({ id: 's2', z: 8 });
+    });
+  });
 });

@@ -17,10 +17,12 @@ import { TrashZone } from './trash-zone';
  * changes once, on release. Notes are painted by their `z`, always beneath the
  * preview and the trash; their rendered order never changes. The board also
  * knows which note, if any, is being edited, so only one note is in edit mode
- * at a time.
+ * at a time. While the saved notes load, an overlay takes every press, so
+ * nothing drawn meanwhile can be replaced by the loaded notes.
  */
 export const Board = ({
   notes,
+  isLoading,
   onCreateNote,
   onMoveNote,
   onResizeNote,
@@ -109,8 +111,23 @@ export const Board = ({
     onCancel: handleDragCancel,
   });
 
+  const renderLoadingOverlay = () => (
+    <div className="board__loading" role="status">
+      <span className="board__spinner" aria-hidden />
+      <span className="board__loading-label">Loading notes…</span>
+    </div>
+  );
+
+  // No drag handlers while loading: a press on the overlay bubbles up to the
+  // board and would otherwise start drawing a note.
   return (
-    <div ref={boardRef} className="board" style={BOARD_SIZE} {...dragHandlers}>
+    <div
+      ref={boardRef}
+      className="board"
+      style={BOARD_SIZE}
+      aria-busy={isLoading}
+      {...(isLoading ? {} : dragHandlers)}
+    >
       <div className="board__notes">
         {notes.map((note) => (
           <NoteCard
@@ -131,6 +148,7 @@ export const Board = ({
       </div>
       <div ref={previewRef} className="board__preview" aria-hidden hidden />
       <TrashZone ref={trashRef} />
+      {isLoading && renderLoadingOverlay()}
     </div>
   );
 };
