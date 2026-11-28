@@ -4,7 +4,7 @@ Dependency rules load from `dependencies.md` when `package.json` or the lockfile
 
 ## Testing and bug fixes
 
-- Browser validation is manual, by the User (Chrome, Firefox, Edge); use DevTools for state, console and performance.
+- Browser validation covers Chrome, Firefox and Edge: by the User with DevTools, or automated with Playwright.
 - Pure logic (reducers, geometry, serialization) gets Vitest unit tests next to the code (`*.test.ts`).
 - **Phased bug fixes:** after each phase that claims to fix the bug, pause for the User's browser confirmation before the next phase. Lint and type-check passing is not fix verification.
 - Never combine a bug fix with a refactor in the same commit.

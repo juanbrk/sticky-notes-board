@@ -23,6 +23,6 @@ Non-negotiable constraints. They are always on; no other rule overrides them.
 
 - **NEVER install packages without approval.** Show the package, why it is needed and the alternative of not adding it.
 - **NEVER skip checks.** After editing, run `npm run lint` and `npm run type-check`; the work is not done until both pass.
-- **No end-to-end or browser-automation frameworks** (Playwright, Cypress, Puppeteer, Selenium). Browser QA is manual, by the User. Vitest is allowed for unit tests of pure logic (reducers, geometry, serialization) only; this is a recorded exception to the geoto-application rule (see `memory-decisions.md`).
+- **Testing**: Vitest unit-tests pure logic (reducers, geometry, serialization). Browser checks may be automated with Playwright (User decision, 2026-11-28: the browser-automation ban was a geoto-application rule and does not apply here). Adding a test package to `package.json` still needs approval, like any package.
 - **No ready-made UI.** The brief forbids stock components: no component libraries, no drag-and-drop or resize libraries. Hand-built on Pointer Events.
 - No "cleanup" changes outside the scope of the current task. Complex refactors and state-management changes are discussed first.
